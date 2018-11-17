@@ -186,8 +186,8 @@ function rcore:autoloader_exec( )
 	*	
 	*	prefix scope
 	*		sv_ = server
-	*       sh_ = shared
-	*       cl_ = client
+	*		sh_ = shared
+	*		cl_ = client
 	* 
 	*	Having a file named sv_helloworld.lua will set the scope to be accessible via server only.
 	*	
