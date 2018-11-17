@@ -22,14 +22,14 @@
 *   @author      Deco Da Man
 *   
 *   types
-*        2:        table
-*        3:        array
-*        4:        false boolean
-*        5:        true boolean
-*        6:        number (NOT COMPRESSED, it isn't worth it)
-*        7:        string (non-LON types start here!)
-*        8:        Vector (NOT COMPRESSED, it isn't worth it)
-*        9:        Angle (NOT COMPRESSED, it isn't worth it)
+*        2:         table
+*        3:         array
+*        4:         false boolean
+*        5:         true boolean
+*        6:         number (NOT COMPRESSED, it isn't worth it)
+*        7:         string (non-LON types start here!)
+*        8:         Vector (NOT COMPRESSED, it isn't worth it)
+*        9:         Angle (NOT COMPRESSED, it isn't worth it)
 *        10:        Entity (Can do players, vehicles, npcs, weapons and any other type of entity (-1 for null entity))
 *        11:        Player (By UserID)
 *        12:        CEffectData
@@ -41,7 +41,7 @@
 */
 
 /*
-*    standard tables and localization
+*   standard tables and localization
 */
 
 local pairs                = pairs
