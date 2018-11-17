@@ -35,9 +35,9 @@
 *        12:        CEffectData
 *        13:        ConVar (Not ClientConVar)
 *        15:        Color
-*        253:    The number equal to -math.huge (tostring(math.huge) == "-1.#INF")
-*        254:    The number equal to math.huge (tostring(math.huge) == "1.#INF")
-*        255:    reference (Sends the ID of the table to use (for "local t = {} t.a=t"))
+*        253:       The number equal to -math.huge (tostring(math.huge) == "-1.#INF")
+*        254:       The number equal to math.huge (tostring(math.huge) == "1.#INF")
+*        255:       reference (Sends the ID of the table to use (for "local t = {} t.a=t"))
 */
 
 /*
