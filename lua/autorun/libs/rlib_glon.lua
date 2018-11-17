@@ -10,7 +10,7 @@
 */
 
 /*
-*	rlib makes use of the glon module as part of its support; however, takes zero credit towards the
+*   rlib makes use of the glon module as part of its support; however, takes zero credit towards the
 *	development other than some tweaks, and integrated functionality. all credit goes to the original 
 *	developer listed in the secondary annotations below
 */
