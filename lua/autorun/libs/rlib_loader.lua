@@ -217,6 +217,7 @@ loaded and are now ready to install additional modules.
 		{ file = 'rlib_core_sv', scope = 1, seg = path_lib },
 		{ file = 'rlib_core_sh', scope = 2, seg = path_lib },
 		{ file = 'rlib_core_cl', scope = 3, seg = path_lib },
+		{ file = 'rlib_glon', scope = 2, seg = path_lib },
 		{ file = 'rlib_spew', scope = 1, seg = path_lib },
 		{ file = 'rlib_lang', scope = 2, seg = path_lib },
 		{ file = 'ui/rlib_ui', scope = 3, seg = path_lib },
