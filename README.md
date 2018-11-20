@@ -1,10 +1,10 @@
 # rlib + rcore
 
-### Usage
+# Usage
 Lua library used as the foundation of scripts developed by Richard for the steam game Garry's Mod.
 You must install this library on your gmod server before any modules can be installed and function properly.
 
-### Installation
+# Installation
 - Download the latest copy of rlib and extract the zip to a local folder on your computer
 - Create a new folder within your gmod server's file structure in the **addons** folder.
   - recommended path **addons/rlib/**
@@ -14,14 +14,14 @@ You must install this library on your gmod server before any modules can be inst
   - Read your server console and check for any mention of rlib loading
   - Type **rlib.status** in your console and check for output.
   
-### About
+# About
 rlib contains a wide variety of commonly used functions that are required for Richard's scripts to work properly. It acts as a foundation for the scripts (modules), and also a debugging utility which helps monitor the server for actions, issues, and anything that the server owner should be made aware of.
 
 All scripts are treated as **modules**, and can be installed in one of two locations:
 - In the provided modules folder located in **addons/rlib/lua/modules** OR;
 - As a seperate folder in the base addons directory (with proper file structure being used)
 
-#### Modules
+### Modules
 All modules require a **manifest** file which gives rlib info on the module itself, and a **config** file which is where settings will be stored. This manifest file not only includes basic information such as name, description, etc., but it can also provide a list of materials to be used, netlib strings, timer ids, data folder structure setup, and more.
 
 A properly structured module is as follows:
@@ -57,4 +57,4 @@ At the very minimum; a module requires two files to be present:
 
 If either file is missing, the module will be _skipped_ and marked as _disabled_.
 
-#### Modules :: Manifest
+** For more in-depth information related to setting up modules, view the documentation for rlib **
