@@ -259,6 +259,21 @@ end
 base.modules.require = base.modules.load
 
 /*
+*   base :: module :: log
+*
+*   logs data to rlib\modules\module_name\logs
+*
+*   @link   : rcore.log
+*
+*   @param  : tbl, str mod
+*   @param  : int cat
+*   @param  : str msg
+*   @param  : varg varg
+*/
+
+base.modules.log = rcore.log
+
+/*
 *   base :: module :: get cfg
 *
 *   fetches config parameters from the specified module

@@ -650,18 +650,21 @@ end
 *
 *   @param  : tbl, str mod
 *   @param  : int cat
-*   @param  : str data
-*   @param  : bool bPostnow
+*   @param  : str msg
+*   @param  : varg varg
 */
 
-function base:log( mod, cat, data, bPostnow )
+function base:log( mod, cat, msg, ... )
     if not mod then
         base:log( 2, 'unable to log unspecified module' )
         return false
     end
 
-    local mod_data
-    local bLoaded           = false
+    local mod_data      = { }
+    local bLoaded       = false
+    local bPostnow      = true
+    local args          = { ... }
+    local result, msg   = pcall( sf, msg, unpack( args ) )
 
     if isstring( mod ) then
         if self.modules[ mod ] and self.modules[ mod ].enabled then
@@ -695,13 +698,13 @@ function base:log( mod, cat, data, bPostnow )
     local f_name    = 'RL_' .. f_prefix .. '.txt'
 
     local c_date    = '[' .. os.date( '%I:%M:%S' ) .. ']'
-    local c_comp    = sf( '%s %s %s', c_date, c_type, data )
+    local c_comp    = sf( '%s %s %s', c_date, c_type, msg )
 
     local _stdir    = storage.mft:getpath( 'dir_modules' )
     storage.file.append( _stdir .. '/' .. mod_data.id .. '/logs', f_name, c_comp )
 
     if bPostnow then
-        konsole:add_simple( cat, data )
+        konsole:add_simple( cat, msg )
     end
 end
 
