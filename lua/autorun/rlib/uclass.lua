@@ -307,6 +307,20 @@ function ui.element( class )
 end
 
 /*
+*   ui :: getscale
+*/
+
+function ui:GetScale( )
+    local sc = math.Clamp( ScrH( ) / 1080, 0.75, 1 )
+    if not th then
+        th  = 48 * sc
+        m   = th * 0.25
+    end
+
+    return sc
+end
+
+/*
 *   ui :: scale
 *
 *   standard scaling
@@ -1309,6 +1323,9 @@ function ui:getsvg( src, bShow )
         </body>
     ]]
 end
+
+ui.OnHover = function( s ) return s:IsHovered( ) end
+ui.OnHoverChild = function( s ) return s:IsHovered( ) or s:IsChildHovered( ) end
 
 /*
 *   ui classes
@@ -4569,7 +4586,97 @@ local uclass = { }
     end
 
     /*
-    *   ui :: class :: fx :: onclick circle
+    *   ui :: class :: anim :: hover :: fill
+    *
+    *   animation causes box to slide in from the specified direction
+    *
+    *   @ex     :anim_hover_fill( Color( 255, 255, 255, 255 ), LEFT, 10 )
+    *
+    *   @param  : clr clr
+    *   @param  : int, enum dir
+    *   @param  : int sp
+    *   @param  : bool bDrawRepl
+    */
+
+    function uclass.anim_hover_fill( pnl, clr, dir, sp, bDrawRepl )
+        clr         = IsColor( clr ) and clr or Color( 5, 5, 5, 200 )
+        dir         = dir or LEFT
+        sp          = isnumber( sp ) and sp or 10
+        mat         = isbool( mat )
+
+        pnl:SetupAnim( 'OnHoverFill', sp, ui.OnHover )
+
+        local function draw_action( s, w, h )
+            local x, y, fw, fh
+            if dir == LEFT then
+                x, y, fw, fh    = 0, 0, math.Round( w * s.OnHoverFill ), h
+            elseif dir == TOP then
+                x, y, fw, fh    = 0, 0, w, math.Round( h * s.OnHoverFill )
+            elseif dir == RIGHT then
+                local prog      = math.Round( w * s.OnHoverFill )
+                x, y, fw, fh    = w - prog, 0, prog, h
+            elseif dir == BOTTOM then
+                local prog      = math.Round( h * s.OnHoverFill )
+                x, y, fw, fh    = 0, h - prog, w, prog
+            end
+
+            design.box( x, y, fw, fh, clr )
+        end
+
+        if not bDrawRepl then
+            pnl:drawover( function( s, w, h )
+                draw_action( s, w, h )
+            end )
+        else
+            pnl:draw( function( s, w, h )
+                draw_action( s, w, h )
+            end )
+        end
+
+    end
+
+    /*
+    *   ui :: class :: anim :: hover :: fade
+    *
+    *   displays a fade animation on hover
+    *
+    *   @ex     :anim_hover_fade( Color( 255, 255, 255, 255 ), 5, 0, false )
+    *
+    *   @param  : clr clr
+    *   @param  : int sp
+    *   @param  : int r
+    *   @param  : bool bDrawRepl
+    */
+
+    function uclass.anim_hover_fade( pnl, clr, sp, r, bDrawRepl )
+        clr         = IsColor( clr ) and clr or Color( 5, 5, 5, 200 )
+        sp          = isnumber( sp ) and sp or 10
+
+        pnl:SetupAnim( 'OnHoverFade', sp, ui.OnHover )
+
+        local function draw_action( s, w, h )
+            local da = ColorAlpha( clr, clr.a * s.OnHoverFade )
+
+            if r and r > 0 then
+                design.rbox( r, 0, 0, w, h, da )
+            else
+                design.box( 0, 0, w, h, da )
+            end
+        end
+
+        if not bDrawRepl then
+            pnl:drawover( function( s, w, h )
+                draw_action( s, w, h )
+            end )
+        else
+            pnl:draw( function( s, w, h )
+                draw_action( s, w, h )
+            end )
+        end
+    end
+
+    /*
+    *   ui :: class :: anim :: onclick circle
     *
     *   creates a simple onclick animation with a poly expanding outward while becoming transparent
     *   based on mouse position
@@ -4606,10 +4713,9 @@ local uclass = { }
             cir.a                   = clr.a
         end )
     end
-    uclass.anim_cir = uclass.anim_click_circle
 
     /*
-    *   ui :: class :: fx :: onclick circle
+    *   ui :: class :: anim :: onclick outline
     *
     *   creates a simple onclick animation with a poly expanding outward while becoming transparent
     *   based on mouse position
@@ -4647,10 +4753,9 @@ local uclass = { }
             cir.a                   = clr.a
         end )
     end
-    uclass.anim_cir_ol = uclass.anim_click_ol
 
     /*
-    *   ui :: class :: fx :: anim :: fade light
+    *   ui :: class :: anim :: fade light
     *
     *   animates a pnl by setting pnl opacity to X with fade effect
     *
@@ -4669,7 +4774,7 @@ local uclass = { }
     uclass.anim_l = uclass.anim_light
 
     /*
-    *   ui :: class :: fx :: anim :: dark
+    *   ui :: class :: anim :: dark
     *
     *   animates a pnl by setting pnl opacity to X with fade effect
     *
@@ -4686,7 +4791,7 @@ local uclass = { }
     uclass.anim_d = uclass.anim_dark
 
     /*
-    *   ui :: class :: fx :: anim :: to color
+    *   ui :: class :: anim :: to color
     *
     *   changes pnl color using animated fade
     *
@@ -4730,6 +4835,26 @@ local uclass = { }
         pnl:onhover     ( )
         pnl:ondisabled  ( )
         pnl:notext      ( )
+    end
+    uclass.SetupBtn = uclass.bsetup
+
+    /*
+    *   ui :: class :: SetupAnim
+    *
+    *   setup of animations
+    *
+    *   @param  : str name
+    *   @param  : int sp
+    *   @param  : func fn
+    */
+
+    function uclass.SetupAnim( pnl, name, sp, fn )
+        fn = pnl.FnAnim or fn
+
+        pnl[ name ] = 0
+        pnl[ 'Think' ] = function( s )
+            s[ name ] = Lerp(FrameTime( ) * sp, s[ name ], fn( s ) and 1 or 0 )
+        end
     end
 
 
