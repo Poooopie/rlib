@@ -496,6 +496,44 @@ function pos.fix_minmax( min, max )
 end
 
 /*
+*   calc :: int2hex
+*
+*   converts intger to hex
+*
+*   @param  : int num
+*
+*   @return : str
+*/
+
+function int2hex( num )
+    local b, str, val, cur, d = 16, '0123456789ABCDEF', '', 0
+    while num > 0 do
+        cur     = cur + 1
+        num, d  = math.floor( num / b ), math.fmod( num, b ) + 1
+        val     = string.sub( str, d, d ) .. val
+    end
+
+
+    val = '0x' .. val
+
+    return val
+end
+
+/*
+*   calc :: hex2int
+*
+*   converts hex to integer
+*
+*   @param  : str hex
+*
+*   @return : int
+*/
+
+function hex2int( hex )
+    return ( tonumber( hex, 16 ) + 2^31 ) % 2^32 - 2^31
+end
+
+/*
 *   concommand :: base command
 *
 *   base package command

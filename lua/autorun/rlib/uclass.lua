@@ -2635,6 +2635,22 @@ local uclass = { }
     end
 
     /*
+    *   ui :: class :: DTextEntry :: AllowInput
+    *
+    *   @param  : func fn
+    */
+
+    function uclass.allowinput( pnl, fn )
+        local name = 'AllowInput'
+        local orig = pnl[ name ]
+
+        pnl[ name ] = function( s, ... )
+            if isfunction( orig ) then orig( s, ... ) end
+            fn( s, ... )
+        end
+    end
+
+    /*
     *   ui :: class :: DProgress :: SetFraction
     *
     *   @param  : int i
@@ -3405,6 +3421,17 @@ local uclass = { }
     end
 
     /*
+    *   ui :: class :: DTextEntry :: SetUpdateOnType
+    *
+    *   sets whether we should fire DTextEntry:OnValueChange 
+    *   every time we type or delete a character or only when Enter is pressed.
+    */
+
+    function uclass.setautoupdate( pnl, b )
+        pnl:SetUpdateOnType( b or false )
+    end
+
+    /*
     *   ui :: class :: Panel :: SetAllowNonAsciiCharacters
     *
     *   configures a text input to allow user to type characters that are not included in 
@@ -3625,11 +3652,24 @@ local uclass = { }
     *   ui :: class :: Panel :: MakePopup
     *
     *   focuses the panel and enables it to receive input.
-    *   automatically calls Panel:SetMouseInputEnabled and Panel:SetKeyboardInputEnabled and sets them to true.
+    *   automatically calls Panel:SetMouseInputEnabled and Panel:SetKeyboardInputEnabled 
+    *   and sets them to true.
+    *
+    *   :   bKeyDisabled
+    *       set TRUE to disable keyboard input
+    *
+    *   :   bMouseDisabled
+    *       set TRUE to disable mouse input
     */
 
-    function uclass.popup( pnl )
+    function uclass.popup( pnl, bKeyDisabled, bMouseDisabled )
         pnl:MakePopup( )
+        if bKeyDisabled then
+            pnl:SetKeyboardInputEnabled( false )
+        end
+        if bMouseDisabled then
+            pnl:SetMouseInputEnabled( false )
+        end
     end
 
     /*

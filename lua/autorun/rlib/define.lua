@@ -23,7 +23,7 @@
 rlib                    = rlib or { }
 local base              = rlib
 local mf                = base.manifest
-local prefix            = mf.prefix
+local pf                = mf.prefix
 
 /*
 *   enums :: logging

@@ -1365,14 +1365,16 @@ function design:notify( mtype, msg, duration, startpos, bFull )
     *   btn :: close
     */
 
-    local obj       = ui.new( 'btn'         )
-    :bsetup         (                       )
-    :size           ( sz_w, ui_h            )
-    :pos            ( pos_w, pos_h          )
-    :front          (                       )
-    :aligntop       ( pos_m2                )
+    local obj       = ui.new( 'btn'                 )
+    :bsetup         (                               )
+    :size           ( sz_w, ui_h                    )
+    :pos            ( pos_w, pos_h                  )
+    :aligntop       ( pos_m2                        )
     :textadv        ( clr_text, pref( 'sys.notify.text' ), msg )
-    :m2f            (                       )
+    :m2f            (                               )
+    :front          (                               )
+    :zpos           ( 9999                          )
+    :popup          ( true, true                    )
 
                     :oc( function ( s )
                         if s.action_close then return end
@@ -1644,8 +1646,8 @@ function design:inform( mtype, msg, title, duration )
     local m_ctime           = CurTime( )
     local val_max           = 300
 
-    local pos_w, pos_h      = text_w + 90, 50 + text_h + 15
-    pos_w                   = math.Clamp( pos_w, 230, val_max )
+    local pos_w, pos_h      = text_w + 120, 50 + text_h + 15
+    pos_w                   = math.Clamp( pos_w, 150, val_max )
 
     /*
     *   pnl :: parent
@@ -1654,6 +1656,10 @@ function design:inform( mtype, msg, title, duration )
     local obj               = ui.new( 'pnl'                 )
     :size                   ( pos_w, pos_h                  )
     :pos                    ( ScrW( ), 200                  )
+    :m2f                    (                               )
+    :front                  (                               )
+    :zpos                   ( 9999                          )
+    :popup                  ( true, true                    )
 
                             :draw( function( s, w, h )
                                 design.box( 0, 0, w, h, Color( 35, 35, 35, 255 ) )
@@ -1681,7 +1687,7 @@ function design:inform( mtype, msg, title, duration )
     :margin                 ( 0, 0, 6, 0                    )
 
                             :draw( function( s, w, h )
-                                draw.SimpleText( title, pref( 'sys.dialog.slider.title' ), w / 2 + 3, 30 / 2 + 1, Color( 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+                                draw.SimpleText( title, pref( 'sys.dialog.slider.title' ), w / 2 - 5, 30 / 2 + 1, Color( 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
                             end )
 
     /*

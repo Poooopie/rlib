@@ -1758,14 +1758,17 @@ end
 /*
 *   helper :: str :: empty str
 *
-*   checks for a valid string but also checks for blank or space strings
+*   checks for a valid string but also checks for blank or space chars
 
 *   @param  : str str
 *   @return : bool
 */
 
 function helper.str:isempty( str )
-    if not isstring( str ) or str == '' or str == ' ' or str == 'NULL' or str == NULL then return true end
+    if not str then return true end
+
+    local text = str:gsub( '%s', '' )
+    if not isstring( text ) or text == '' or text == 'NULL' or str == NULL then return true end
     return false
 end
 
