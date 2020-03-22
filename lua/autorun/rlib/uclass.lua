@@ -311,13 +311,7 @@ end
 */
 
 function ui:GetScale( )
-    local sc = math.Clamp( ScrH( ) / 1080, 0.75, 1 )
-    if not th then
-        th  = 48 * sc
-        m   = th * 0.25
-    end
-
-    return sc
+    return math.Clamp( ScrH( ) / 1080, 0.75, 1 )
 end
 
 /*
@@ -334,7 +328,7 @@ function ui:scale( iclamp )
 end
 
 /*
-*   ui :: screenscale
+*   ui :: Scale640
 *
 *   works similar to glua ScreenScale( )
 *
@@ -343,7 +337,7 @@ end
 *   @return : int
 */
 
-function ui:screenscale( val, iMax )
+function ui:Scale640( val, iMax )
     iMax = isnumber( iMax ) and iMax or ScrW( )
     return val * ( iMax / 640.0 )
 end
@@ -377,11 +371,11 @@ end
 
 function ui:cscale( bSimple, i800, i1024, i1280, i1366, i1600, i1920, i2xxx )
     if not isbool( bSimple ) then
-        base:log( 2, 'func [%s]: bSimple not bool', debug.getinfo( 1, 'n' ).name )
+        base:log( 2, 'func [ %s ]: bSimple not bool', debug.getinfo( 1, 'n' ).name )
     end
 
     if not i800 then
-        base:log( 2, 'func [%s]: no scale int specified', debug.getinfo( 1, 'n' ).name )
+        base:log( 2, 'func [ %s ]: no scale int specified', debug.getinfo( 1, 'n' ).name )
     end
 
     if not i1024 then i1024, i1280, i1366, i1600, i1920, i2xxx = i800, i800, i800, i800, i800, i800 end
@@ -404,12 +398,12 @@ function ui:cscale( bSimple, i800, i1024, i1280, i1366, i1600, i1920, i2xxx )
     elseif ScrW( ) > 1600 and ScrW( ) <= 1920 then
         return bSimple and i1920 or ScreenScale( i1920 )
     elseif ScrW( ) > 1920 then
-        return bSimple and i2xxx or self:screenscale( i1920, 1920 )
+        return bSimple and i2xxx or self:scale640( i1920, 1920 )
     end
 end
 
 /*
-*   ui :: controlled scale :: strict
+*   ui :: smartscale :: strict
 *
 *   a more controlled solution to screen scaling because I dislike how doing simple ScreenScaling never 
 *   makes things perfect.
@@ -435,13 +429,13 @@ end
 *   @return : int
 */
 
-function ui:cscale_strict( bSimple, i800, i1024, i1280, i1366, i1600, i1920, i2560 )
+function ui:SmartScale_Strict( bSimple, i800, i1024, i1280, i1366, i1600, i1920, i2560 )
     if not isbool( bSimple ) then
-        base:log( 2, 'func [%s]: bSimple not bool', debug.getinfo( 1, 'n' ).name )
+        base:log( 2, 'func [ %s ]: bSimple not bool', debug.getinfo( 1, 'n' ).name )
     end
 
     if not i800 then
-        base:log( 2, 'func [%s]: no scale int specified', debug.getinfo( 1, 'n' ).name )
+        base:log( 2, 'func [ %s ]: no scale int specified', debug.getinfo( 1, 'n' ).name )
     end
 
     if not i1024 then i1024, i1280, i1366, i1600, i1920, i2560 = i800, i800, i800, i800, i800, i800 end
@@ -464,27 +458,27 @@ function ui:cscale_strict( bSimple, i800, i1024, i1280, i1366, i1600, i1920, i25
     elseif ScrW( ) > 1600 and ScrW( ) <= 1920 then
         return bSimple and i1920 or ScreenScale( i1920 )
     elseif ScrW( ) > 1920 then
-        return bSimple and i2560 or self:screenscale( i2560, 2560 )
+        return bSimple and i2560 or self:scale640( i2560, 2560 )
     end
 end
 
 /*
-*   ui :: limit scale
+*   ui :: clamp scale
 *
-*   clamp a width and height value
+*   scale utilizing a clamped w and h value
 *
 *   @param  : int w
 *   @param  : int h
 *   @return : int w, h
 */
 
-function ui:lscale( w, h )
+function ui:ClampScale( w, h )
     h = isnumber( h ) and h or w
     return math.Clamp( 1920, 0, ScrW( ) / w ), math.Clamp( 1080, 0, ScrH( ) / h )
 end
 
 /*
-*   ui :: scale :: width
+*   ui :: clamp scale :: width
 *
 *   clamp a width value
 *
@@ -494,13 +488,13 @@ end
 *   @return : int
 */
 
-function ui:scale_w( w, min, max )
+function ui:ClampScale_w( w, min, max )
     w = isnumber( w ) and w or ScrW( )
     return math.Clamp( ScreenScale( w ), min or 0, max or ScreenScale( w ) )
 end
 
 /*
-*   ui :: scale :: height
+*   ui :: clamp scale :: height
 *
 *   clamp a height value
 *
@@ -510,7 +504,7 @@ end
 *   @return : int
 */
 
-function ui:scale_h( h, min, max )
+function ui:ClampScale_h( h, min, max )
     h = isnumber( h ) and h or ScrH( )
     return math.Clamp( ScreenScale( h ), min or 0, max or ScreenScale( h ) )
 end
@@ -519,6 +513,8 @@ end
 *   ui :: basic scale
 *
 *   basic scaling control
+*
+*   @note   : deprecated in future
 *
 *   @param  : int s
 *   @param  : int m
@@ -545,6 +541,8 @@ end
 *   ui :: scalesimple
 *
 *   simple scaling
+*
+*   @note   : deprecated in future
 *
 *   @param  : int s
 *   @param  : int m
@@ -586,30 +584,6 @@ function ui:setscale( w, h )
     local ui_w, ui_h        = sc_w * pnl_w, sc_h * pnl_h
 
     return ui_w, ui_h
-end
-
-/*
-*   ui :: get_padding
-*
-*   return current padding
-*
-*   @return : int
-*/
-
-function ui:getpadding( val )
-    return val or 0
-end
-
-/*
-*   ui :: get_margin
-*
-*   return current margin
-*
-*   @return : int
-*/
-
-function ui:getmargin( val )
-    return val or 0
 end
 
 /*
@@ -836,7 +810,7 @@ end
 *   @param  : int y
 */
 
-function ui:setpos( pnl, x, y )
+function ui:pos( pnl, x, y )
     x = x or 0
     y = y or 0
     if self:valid( pnl ) and self:visible( pnl ) then
@@ -864,7 +838,7 @@ function ui:movecenter( w, h, time )
 end
 
 /*
-*   ui :: setpos center
+*   ui :: pos :: center
 *
 *   animation to move panel to center
 *
@@ -876,7 +850,7 @@ end
 *   @param  : str, int from :: [optional] :: default left
 */
 
-function ui:setpos_center( pnl, time, from )
+function ui:pos_center( pnl, time, from )
     if not self:valid( pnl ) then return end
     local w, h = pnl:GetSize( )
 
@@ -901,6 +875,29 @@ function ui:setpos_center( pnl, time, from )
 
     pnl:SetPos( init_w, init_h )
     pnl:MoveTo( move_w, move_h, time, 0, -1 )
+end
+
+/*
+*   ui :: pos :: anim
+*
+*   forces a pnl to center screen based on animation settings
+*
+*   @param  : pnl pnl
+*   @param  : int time
+*   @param  : str, int from :: [optional] :: default left
+*/
+
+function ui:pos_anim( pnl, time, from )
+    if not self:visible( pnl ) then return end
+
+    time = isnumber( time ) and time or 0.4
+    from = isnumber( from ) and from or 4
+
+    if helper:cvar_bool( 'rlib_animations_enabled' ) then
+        self:pos_center( pnl, time, from )
+    else
+        self:pos_center( pnl )
+    end
 end
 
 /*
@@ -4883,6 +4880,8 @@ local uclass = { }
     *
     *   setup of animations
     *
+    *   @alias  : SetupAnim, setupanim, anim_setup
+    *
     *   @param  : str name
     *   @param  : int sp
     *   @param  : func fn
@@ -4896,7 +4895,8 @@ local uclass = { }
             s[ name ] = Lerp(FrameTime( ) * sp, s[ name ], fn( s ) and 1 or 0 )
         end
     end
-
+    uclass.setupanim    = uclass.SetupAnim
+    uclass.anim_setup   = uclass.SetupAnim
 
 /*
 *   metatable :: ui

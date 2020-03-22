@@ -813,9 +813,9 @@ function PANEL:Init( )
     */
 
     if helper:cvar_bool( 'rlib_animations_enabled' ) then
-        ui:setpos_center( self, 0.3, 1 )
+        ui:pos_center( self, 0.3, 1 )
     else
-        ui:setpos_center( self )
+        ui:pos_center( self )
     end
 
     /*

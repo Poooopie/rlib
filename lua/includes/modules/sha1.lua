@@ -417,7 +417,7 @@ function sha1.encrypt( msg )
     *   append len as 64-bit
     */
 
-    local b1, r1    = modf( msg_len_in_bits / 0x01000000 ) 
+    local b1, r1    = modf( msg_len_in_bits / 0x01000000 )
     local b2, r2    = modf( 0x01000000 * r1 / 0x00010000 )
     local b3, r3    = modf( 0x00010000 * r2 / 0x00000100 )
     local b4        = 0x00000100 * r3

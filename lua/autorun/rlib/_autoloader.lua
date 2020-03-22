@@ -51,7 +51,7 @@ function rlib.autoload:Run( parent )
     mf.repo                     = 'https://github.com/im-richard/rlib/'
     mf.docs                     = 'https://docs.rlib.io/'
     mf.about                    = [[rlib is a glua library written for garrys mod which contains a variety of commonly used functions that are required for certain scripts to run properly. Package includes both rlib + rcore which act as the overall foundation which other scripts will rest within as a series of modules. ]]
-    mf.released                 = 1584491799
+    mf.released                 = 1584884703
     mf.version                  = { 3, 0, 1 }
     mf.showcopyright            = true
 
@@ -327,12 +327,22 @@ loaded and are now ready to install additional modules.
     end
 
     /*
-    *   module inc
+    *   load lua modules
     */
 
-    if file.Exists( 'includes/modules/sha1.lua', 'LUA' ) then
-        include( 'includes/modules/sha1.lua' )
-        if SERVER then AddCSLuaFile( 'includes/modules/sha1.lua' ) end
+    local modules_lua =
+    {
+        'sha1',
+        'json',
+        'rbit',
+        'ipcrypt',
+    }
+
+    for k, v in pairs( modules_lua ) do
+        if file.Exists( 'includes/modules/' .. v .. '.lua', 'LUA' ) then
+            include( 'includes/modules/' .. v .. '.lua' )
+            if SERVER then AddCSLuaFile( 'includes/modules/' .. v .. '.lua' ) end
+        end
     end
 
     /*
