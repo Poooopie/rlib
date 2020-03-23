@@ -480,7 +480,7 @@ function base:console( pl, ... )
     if CLIENT or not pl or base:isconsole( pl ) or pl == 'console' then
         MsgC( Color( 255, 255, 255 ), ' ', unpack( args ) )
     else
-        pl:sendconsole( ... )
+        pl:konsole( ... )
     end
 end
 

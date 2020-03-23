@@ -130,26 +130,33 @@ end
 *   network library
 */
 
-util.AddNetworkString( 'rlib.udm.check'             )
-util.AddNetworkString( 'rlib.konsole'               )
-util.AddNetworkString( 'rlib.debug.console'         )
-util.AddNetworkString( 'rlib.debug.listener'        )
-util.AddNetworkString( 'rlib.debug.ui'              )
-util.AddNetworkString( 'rlib.chat.msg'              )
-util.AddNetworkString( 'rlib.chat.console'          )
-util.AddNetworkString( 'rlib.user'                  )
-util.AddNetworkString( 'rlib.user.join'             )
-util.AddNetworkString( 'rlib.user.update'           )
-util.AddNetworkString( 'rlib.rsay'                  )
-util.AddNetworkString( 'rlib.tools.pco'             )
-util.AddNetworkString( 'rlib.tools.lang'            )
-util.AddNetworkString( 'rlib.tools.dc'              )
-util.AddNetworkString( 'rlib.tools.rmain'           )
-util.AddNetworkString( 'rlib.tools.rcfg'            )
-util.AddNetworkString( 'rlib.tools.mdlviewer'       )
-util.AddNetworkString( 'rlib.tools.report'          )
-util.AddNetworkString( 'rlib.notify'                )
-util.AddNetworkString( 'rlib.notify.slider'         )
+local net_register =
+{
+    'rlib.debug.console',
+    'rlib.debug.listener',
+    'rlib.debug.ui',
+    'rlib.konsole',
+    'rlib.rsay',
+    'rlib.sms.umsg',
+    'rlib.sms.konsole',
+    'rlib.sms.notify',
+    'rlib.sms.inform',
+    'rlib.tools.pco',
+    'rlib.tools.lang',
+    'rlib.tools.dc',
+    'rlib.tools.rmain',
+    'rlib.tools.rcfg',
+    'rlib.tools.mdlviewer',
+    'rlib.tools.report',
+    'rlib.udm.check',
+    'rlib.user',
+    'rlib.user.join',
+    'rlib.user.update',
+}
+
+for k, v in pairs( net_register ) do
+    util.AddNetworkString( v )
+end
 
 /*
 *   metatable :: ply
@@ -158,40 +165,51 @@ util.AddNetworkString( 'rlib.notify.slider'         )
 local pmeta = FindMetaTable( 'Player' )
 
 /*
-*   message system
+*   msg sys :: broadcast
 */
 
 function base:broadcast( ... )
     local args      = { ... }
-    net.Start       ( 'rlib.chat.msg'       )
+    net.Start       ( 'rlib.sms.notify'     )
     net.WriteTable  ( args                  )
     net.Broadcast   (                       )
 end
 
-function pmeta:msg( ... )
+function base:inform( ... )
     local args      = { ... }
-    net.Start       ( 'rlib.chat.msg'       )
+    net.Start       ( 'rlib.sms.inform'     )
     net.WriteTable  ( args                  )
-    net.Send        ( self                  )
+    net.Broadcast   (                       )
 end
+
+/*
+*   msg sys :: pmeta
+*/
 
 function pmeta:notify( ... )
     local args      = { ... }
-    net.Start       ( 'rlib.notify'         )
+    net.Start       ( 'rlib.sms.notify'     )
     net.WriteTable  ( args                  )
     net.Send        ( self                  )
 end
 
 function pmeta:inform( ... )
     local args      = { ... }
-    net.Start       ( 'rlib.notify.slider'  )
+    net.Start       ( 'rlib.sms.inform'     )
     net.WriteTable  ( args                  )
     net.Send        ( self                  )
 end
 
-function pmeta:sendconsole( ... )
+function pmeta:umsg( ... )
     local args      = { ... }
-    net.Start       ( 'rlib.chat.console'   )
+    net.Start       ( 'rlib.sms.umsg'       )
+    net.WriteTable  ( args                  )
+    net.Send        ( self                  )
+end
+
+function pmeta:konsole( ... )
+    local args      = { ... }
+    net.Start       ( 'rlib.sms.konsole'    )
     net.WriteTable  ( args                  )
     net.Send        ( self                  )
 end
@@ -1924,7 +1942,7 @@ function tools:asay( sender, ... )
     if base:isconsole( sender ) then
         base:console( sender, sclr.c2, '[' .. cfg.smsg.to_asay .. ']', sclr.msg, ' sent by ', sclr.c1, cfg.smsg.to_console, sclr.msg, ' » ', sclr.msg, ... )
     elseif not base:isconsole( sender ) and helper.ok.ply( sender ) then
-        sender:msg( sclr.t1, cfg.smsg.to_self, sclr.msg, ' » ', sclr.t4, cfg.smsg.to_admins, sclr.msg, ':\n', sclr.msg, ... )
+        sender:umsg( sclr.t1, cfg.smsg.to_self, sclr.msg, ' » ', sclr.t4, cfg.smsg.to_admins, sclr.msg, ':\n', sclr.msg, ... )
         base:log( RLIB_LOG_ASAY, '[ %s ] » %s', from, ... )
     end
 
@@ -1935,7 +1953,7 @@ function tools:asay( sender, ... )
     for v in helper.get.players( ) do
         if v == sender then continue end
         if not access:allow( v, 'rlib_asay' ) then continue end
-        v:msg( sclr.t1, from, sclr.msg, ' » ', sclr.t3, cfg.smsg.to_admins, sclr.msg, '\n', sclr.msg, unpack( args ) )
+        v:umsg( sclr.t1, from, sclr.msg, ' » ', sclr.t3, cfg.smsg.to_admins, sclr.msg, '\n', sclr.msg, unpack( args ) )
     end
 
 end
@@ -1990,7 +2008,7 @@ function tools:alogs( cat, sender, ... )
 
     for v in helper.get.players( ) do
         if not access:allow( v, 'rlib_alogs' ) then continue end
-        v:msg( sclr.t1, sender, sclr.msg, ' » ', sclr.t3, c_type, sclr.msg, ' » ', sclr.t2, cfg.smsg.to_admins, sclr.msg, ':\n', sclr.msg, unpack( args ) )
+        v:umsg( sclr.t1, sender, sclr.msg, ' » ', sclr.t3, c_type, sclr.msg, ' » ', sclr.t2, cfg.smsg.to_admins, sclr.msg, ':\n', sclr.msg, unpack( args ) )
     end
 
     /*

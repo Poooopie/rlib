@@ -88,39 +88,39 @@ local function pref( str, suffix )
 end
 
 /*
-*   netlib :: chatmsg
+*   netlib :: sms :: umsg
 *
 *   sends a message directly to the ply chat
 */
 
-local function netlib_chatmsg( len, ply )
+local function netlib_sms_umsg( len, ply )
     local msg = net.ReadTable( )
     if not msg then return end
     chat.AddText( unpack( msg ) )
 end
-net.Receive( 'rlib.chat.msg', netlib_chatmsg )
+net.Receive( 'rlib.sms.umsg', netlib_sms_umsg )
 
 /*
-*   netlib :: chatconsole
+*   netlib :: sms :: konsole
 *
 *   sends a message directly to the ply console
 */
 
-local function netlib_chatconsole( len, ply )
+local function netlib_sms_konsole( len, ply )
     local msg = net.ReadTable( )
     if not msg then return end
     table.insert( msg, '\n' )
     MsgC( Color( 255, 255, 255 ), unpack( msg ) )
 end
-net.Receive( 'rlib.chat.console', netlib_chatconsole )
+net.Receive( 'rlib.sms.konsole', netlib_sms_konsole )
 
 /*
-*   netlib :: notify
+*   netlib :: sms :: notify
 *
 *   sends a standard notification directly to the ply screen
 */
 
-local function netlib_notify( len, ply )
+local function netlib_sms_notify( len, ply )
     local args  = net.ReadTable( )
     local cat   = args and args[ 1 ] or 1
     local msg   = args and args[ 2 ] or ''
@@ -130,16 +130,16 @@ local function netlib_notify( len, ply )
 
     design:notify( cat, msg, dur, pos, bFull )
 end
-net.Receive( 'rlib.notify', netlib_notify )
+net.Receive( 'rlib.sms.notify', netlib_sms_notify )
 
 /*
-*   netlib :: inform
+*   netlib :: inform :: bc
 *
 *   sends a slider notification directly to the ply screen
 *   slides in from the right side.
 */
 
-local function netlib_inform( len, ply )
+local function netlib_sms_inform( len, ply )
     local args  = net.ReadTable( )
     local cat   = args and args[ 1 ] or 1
     local msg   = args and args[ 2 ] or ''
@@ -148,7 +148,7 @@ local function netlib_inform( len, ply )
 
     design:inform( cat, msg, title, dur )
 end
-net.Receive( 'rlib.notify.slider', netlib_inform )
+net.Receive( 'rlib.sms.inform', netlib_sms_inform )
 
 /*
 *   get material data
