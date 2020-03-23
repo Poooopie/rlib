@@ -1365,38 +1365,35 @@ function design:notify( mtype, msg, duration, startpos, bFull )
     *   btn :: close
     */
 
-    local obj       = ui.new( 'btn'                 )
-    :bsetup         (                               )
-    :size           ( sz_w, ui_h                    )
-    :pos            ( pos_w, pos_h                  )
-    :aligntop       ( pos_m2                        )
-    :textadv        ( clr_text, pref( 'sys.notify.text' ), msg )
-    :m2f            (                               )
-    :front          (                               )
-    :zpos           ( 9999                          )
-    :popup          ( true, true                    )
+    local obj           = ui.new( 'btn'                 )
+    :bsetup             (                               )
+    :size               ( sz_w, ui_h                    )
+    :pos                ( pos_w, pos_h                  )
+    :aligntop           ( pos_m2                        )
+    :textadv            ( clr_text, pref( 'sys.notify.text' ), msg )
+    :drawtop            ( true                          )
 
-                    :oc( function ( s )
-                        if s.action_close then return end
-                        s.action_close = true
-                        s:Stop( )
-                        s:MoveTo( pos_w, pos_m2, 0.5, 0, -1, function( )
-                            ui:destroy_visible( s )
+                        :oc( function ( s )
+                            if s.action_close then return end
+                            s.action_close = true
+                            s:Stop( )
+                            s:MoveTo( pos_w, pos_m2, 0.5, 0, -1, function( )
+                                ui:destroy_visible( s )
+                            end )
                         end )
-                    end )
 
-                    :draw( function( s, w, h )
-                        local pulse     = math.abs( math.sin( CurTime( ) * 2 ) * 255 )
-                        pulse           = math.Clamp( pulse, 125, 175 )
+                        :draw( function( s, w, h )
+                            local pulse     = math.abs( math.sin( CurTime( ) * 2 ) * 255 )
+                            pulse           = math.Clamp( pulse, 125, 175 )
 
-                        design.box( 3, 2, w - 6, h - 4, Color( 0, 0, 0, 200 ) )
-                        design.box( 4, 3, w - 8, h - 6, clr_bg )
-                        design.box( 4, 3, w - 8, h - 6, Color( 0, 0, 0, pulse ) )
-                    end )
+                            design.box( 3, 2, w - 6, h - 4, Color( 0, 0, 0, 200 ) )
+                            design.box( 4, 3, w - 8, h - 6, clr_bg )
+                            design.box( 4, 3, w - 8, h - 6, Color( 0, 0, 0, pulse ) )
+                        end )
 
-                    :think( function( s )
-                        s:SetZPos( 5000 )
-                    end )
+                        :think( function( s )
+                            s:SetZPos( 5000 )
+                        end )
 
     /*
     *  notice sound
@@ -1656,10 +1653,7 @@ function design:inform( mtype, msg, title, duration )
     local obj               = ui.new( 'pnl'                 )
     :size                   ( pos_w, pos_h                  )
     :pos                    ( ScrW( ), 200                  )
-    :m2f                    (                               )
-    :front                  (                               )
-    :zpos                   ( 9999                          )
-    :popup                  ( true, true                    )
+    :drawtop                ( true                          )
 
                             :draw( function( s, w, h )
                                 design.box( 0, 0, w, h, Color( 35, 35, 35, 255 ) )
