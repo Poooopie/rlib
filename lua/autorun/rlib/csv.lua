@@ -2432,5 +2432,3 @@ local function tools_mviewer_ps_toggle( pl, text )
     return ''
 end
 hook.Add( 'PlayerSay', pid( 'tools.mviewer.psay.toggle' ), tools_mviewer_ps_toggle )
-
-PrintTable( hook )

@@ -126,8 +126,6 @@ function ulx.rcore_rp_setjob( calling_ply, target_ply, job )
         end
     end
 
-    PrintTable( newjob )
-
     target_ply:updateJob( newjob.name )
     target_ply:setSelfDarkRPVar( 'salary', newjob.salary )
     target_ply:SetTeam( newnum )
