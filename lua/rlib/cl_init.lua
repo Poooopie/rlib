@@ -23,36 +23,17 @@
 
 rcore                   = rcore or { }
 local base              = rcore
-local prefix            = base.manifest.prefix
+local pf                = base.manifest.prefix
 
 /*
 *   Localized rlib routes
 *
-*   : base.h          = helpers
-*   : base.d          = draw/design
-*   : base.c          = calls
-*   : base.p          = panels
-*   : base.i          = interface
-*   : base.s          = storage
+*   : base.h            = helpers
+*   : base.a            = access
 */
 
 local helper            = rlib.h
 local access            = rlib.a
-local design            = rlib.d
-local ui                = rlib.i
-local mats              = rlib.m
-
-/*
-*   Localized cmd func
-*
-*   @source : lua\autorun\libs\_calls
-*   @param  : str type
-*   @param  : varg { ... }
-*/
-
-local function call( t, ... )
-    return rlib:call( t, ... )
-end
 
 /*
 *   Localized translation func
@@ -60,31 +41,6 @@ end
 
 local function lang( ... )
     return rlib:translate( mod, ... )
-end
-
-/*
-*   Localized res func
-*/
-
-local function resources( t, ... )
-    return rlib:resource( mod, t, ... )
-end
-
-/*
-*	localized mat func
-*/
-
-local function mat( id )
-    return mats:call( mod, id )
-end
-
-/*
-*	prefix ids
-*/
-
-local function pref( str, suffix )
-    local state = not suffix and mod or isstring( suffix ) and suffix or false
-    return rlib.get:pref( str, state )
 end
 
 /*
@@ -183,12 +139,12 @@ function base:mats_get( src, mod )
 
     suffix = suffix and suffix:lower( )
 
-    local mat = 'm_' .. src
+    local mat_ref = 'm_' .. src
     if suffix then
-        mat = 'm_' .. suffix .. '_' .. src
+        mat_ref = 'm_' .. suffix .. '_' .. src
     end
 
-    return rlib.m[ mat ] or mat or ''
+    return rlib.m[ mat_ref ] or mat_ref or ''
 end
 
 /*
@@ -221,19 +177,19 @@ function base:mats_index( mod, bPath )
         suffix = mod
     end
 
-    suffix = suffix and string.lower( suffix )
+    suffix = suffix and suffix:lower( )
 
     if not mod then
         return rlib.m
     end
 
-    local mat = 'm_' .. suffix .. '_'
+    local mat_ref = 'm_' .. suffix .. '_'
 
     local resp, cnt = { }, 0
     for k, v in pairs( rlib.m ) do
-        if ( string.find( k, mat, 1, true ) ~= nil ) then
+        if ( string.find( k, mat_ref, 1, true ) ~= nil ) then
             local id    = k
-            id          = id:gsub( mat, '' )
+            id          = id:gsub( mat_ref, '' )
             resp[ id ]  = bPath and k.path or v
             cnt         = cnt + 1
         end
@@ -265,4 +221,4 @@ function base:modules_perms_register( source )
         access:initialize( v.permissions )
     end
 end
-hook.Add( 'PostGamemodeLoaded', prefix .. 'modules.permissions.register', function( source ) base:modules_perms_register( source ) end )
+rhook.new.gmod( 'PostGamemodeLoaded', 'rcore_modules_perms_register', function( source ) base:modules_perms_register( source ) end )

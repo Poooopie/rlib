@@ -716,7 +716,7 @@ end
 
 local function modules_initialize( )
 
-    hook.Run( pid( 'modules.load.pre' ) )
+    rhook.run.rlib( 'modules_load_pre' )
 
     autoloader_manifest_modules( )
 
@@ -732,11 +732,11 @@ local function modules_initialize( )
 
     rlib:log( 0 )
 
-    hook.Run( pid( 'modules.load.post' ), base.modules )
+    rhook.run.rlib( 'rcore_modules_load_post', base.modules )
 
 end
-hook.Add( pid( 'loader.post' ), pid( 'modules.initialize' ), modules_initialize )
-hook.Add( 'OnReloaded', pid( 'modules.onreload' ), modules_initialize )
+rhook.new.rlib( 'rcore_loader_post', 'rcore_modules_initialize', modules_initialize )
+rhook.new.gmod( 'OnReloaded', 'rcore_modules_onreload', modules_initialize )
 
 /*
 *   modules :: storage
@@ -800,7 +800,7 @@ function base:modules_storage( source )
     end
 
 end
-hook.Add( 'PostGamemodeLoaded', pid( 'modules.storage' ), function( source ) base:modules_storage( source ) end )
+rhook.new.gmod( 'PostGamemodeLoaded', 'rcore_modules_storage', function( source ) base:modules_storage( source ) end )
 
 /*
 *   modules :: precache
@@ -900,7 +900,7 @@ function base:modules_precache( source )
         end
     end
 end
-hook.Add( 'PostGamemodeLoaded', pid( 'modules.precache' ), function( source ) base:modules_precache( source ) end )
+rhook.new.gmod( 'PostGamemodeLoaded', 'rcore_modules_precache', function( source ) base:modules_precache( source ) end )
 
 /*
 *   modules :: dependency check
@@ -938,7 +938,7 @@ local function modules_dependencies( source )
         end
     end
 end
-hook.Add( 'PostGamemodeLoaded', pid( 'modules.dependencies' ), modules_dependencies )
+rhook.new.gmod( 'PostGamemodeLoaded', 'rcore_modules_dependencies', modules_dependencies )
 
 /*
 *   modules :: register workshops
@@ -1049,7 +1049,7 @@ local function modules_resources( source )
     end
 
 end
-hook.Add( pid( 'modules.load.post' ), pid( 'modules.resources.register' ), modules_resources )
+rhook.new.rlib( 'rcore_modules_load_post', 'rcore_modules_res_register', modules_resources )
 
 /*
 *   modules :: register particles
@@ -1096,7 +1096,7 @@ local function register_particles( source )
     end
 
 end
-hook.Add( pid( 'modules.load.post' ), pid( 'modules.particles.register' ), register_particles )
+rhook.new.rlib( 'rcore_modules_load_post', 'rcore_modules_ptc_register', register_particles )
 
 /*
 *   modules :: register sounds
@@ -1140,14 +1140,14 @@ local function register_sounds( source )
     end
 
 end
-hook.Add( pid( 'modules.load.post' ), pid( 'modules.sounds.register' ), register_sounds )
+rhook.new.rlib( 'rcore_modules_load_post', 'rcore_modules_snd_register', register_sounds )
 
 /*
 *   modules :: storage :: register defaults
 *
 *   register default storage tables
 *
-*   @ex     : hook.Run( pid( 'modules.storage.struct' ), mod_id )
+*   @ex     : rhook.run.rlib( 'rcore_modules_storage_struct', mod_id )
 *
 *   @param  : tbl source
 */
@@ -1249,7 +1249,7 @@ local function storage_struct_defs( mod_id )
     end
 
 end
-hook.Add( pid( 'modules.storage.struct' ), pid( 'modules.storage.struct' ), storage_struct_defs )
+rhook.new.rlib( 'rcore_modules_storage_struct', storage_struct_defs )
 
 /*
 *   register module
@@ -1369,7 +1369,7 @@ function base:module_register( path, mod, b_isext )
     *   on repetitiveness of declaring these in the module manifest file
     */
 
-    hook.Run( pid( 'modules.storage.struct' ), mod_id )
+    rhook.run.rlib( 'rcore_modules_storage_struct', mod_id )
 
     /*
     *   module sys tbl
@@ -1440,7 +1440,7 @@ function base:module_register( path, mod, b_isext )
     end
 
     if rnet then
-        hook.Run( pid( 'rnet_register', mod_id ) )
+        rhook.run.gmod( pid( 'rnet_register', mod_id ) )
     end
 
     /*
@@ -1462,4 +1462,4 @@ function base:module_register( path, mod, b_isext )
     end
 
 end
-hook.Add( pid( 'modules.register' ), pid( 'modules.register' ), function( path, mod, b_isext ) base:module_register( path, mod, b_isext ) end )
+rhook.new.rlib( 'rcore_modules_register', function( path, mod, b_isext ) base:module_register( path, mod, b_isext ) end )

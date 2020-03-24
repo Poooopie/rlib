@@ -80,15 +80,16 @@ function rlib.autoload:Run( parent )
             { file = 'ccl',                     scope = 3 },
             { file = 'tools',                   scope = 3 },
             { file = 'commands',                scope = 1 },
+            { file = 'patches',                 scope = 1 },
             { file = 'pmeta',                   scope = 2 },
             { file = 'uclass',                  scope = 3 },
             { file = 'design',                  scope = 3 },
         },
         pre =
         {
+            'hook',
             'calc',
             'rnet',
-            'hook',
             'rhook',
             'rcc',
             'timex',
@@ -570,6 +571,6 @@ loaded and are now ready to install additional modules.
     *   hook :: rlib post loader
     */
 
-    hook.Run( prefix .. 'loader.post' )
+    rhook.run.rlib( 'rlib_loader_post' )
 
 end

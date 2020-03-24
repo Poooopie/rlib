@@ -1100,8 +1100,9 @@ function utils.cc_rnet_refresh( ply, cmd, args )
         if not v.enabled then continue end
 
         local suffix    = rcore:modules_prefix( v )
-        local id        = suffix .. 'rnet.register'
-        hook.Run( id )
+        local id        = sf( '%srnet.register', suffix )
+
+                        rhook.run.gmod( id )
 
         if rnet.cfg.debug then
             base:log( dcat, 'registered module [ %s ]', id )

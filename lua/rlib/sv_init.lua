@@ -98,7 +98,7 @@ local function stats_initialize( )
 
     sys.starttime = timex.secs.benchmark( SysTime( ) )
 end
-hook.Add( pid( 'initialize.post', rlib_mf.prefix ), pid( 'server.initialize' ), stats_initialize )
+rhook.new.rlib( 'rlib_initialize_post', 'rcore_server_initialize', stats_initialize )
 
 /*
 *   modules :: write data
@@ -116,8 +116,8 @@ function base:modules_writedata( )
     *   outputs the current installed modules to json in data/rlib
     */
 
-    local mdata = { }
-    mdata.modules = { }
+    local mdata     = { }
+    mdata.modules   = { }
     for k, v in pairs( base.modules ) do
         mdata.modules[ k ]          = { }
         mdata.modules[ k ].name     = v.name
@@ -177,7 +177,7 @@ function base:modules_writedata( )
     file.Write( path_history, util.TableToJSON( data ) )
 
 end
-hook.Add( pid( 'modules.load.post' ), pid( 'modules.writedata' ), function( ) base:modules_writedata( ) end )
+rhook.new.rlib( 'rcore_modules_load_post', 'rcore_modules_writedata', function( ) base:modules_writedata( ) end )
 
 /*
 *   validate module
@@ -258,7 +258,7 @@ function base:module_validate( source, bBypass )
         end
     end )
 end
-hook.Add( 'Initialize', pid( 'modules.validate' ), function( source ) base:module_validate( source ) end )
+rhook.new.gmod( 'Initialize', 'rcore_modules_validate', function( source ) base:module_validate( source ) end )
 
 /*
 *   modules :: register permissions
@@ -282,7 +282,7 @@ function base:modules_perms_register( source )
         rlib.a:initialize( v.permissions )
     end
 end
-hook.Add( 'PostGamemodeLoaded', pid( 'modules.permissions.register' ), function( source ) base:modules_perms_register( source ) end )
+rhook.new.gmod( 'PostGamemodeLoaded', 'rcore_modules_perms_register', function( source ) base:modules_perms_register( source ) end )
 
 /*
 *   concommand :: reload

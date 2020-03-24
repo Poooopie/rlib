@@ -75,8 +75,8 @@ end
 */
 
 local function pref( id, suffix )
-    local affix = istable( suffix ) and suffix.id or isstring( suffix ) and suffix or prefix
-    affix = affix:sub( -1 ) ~= '.' and string.format( '%s.', affix ) or affix
+    local affix     = istable( suffix ) and suffix.id or isstring( suffix ) and suffix or prefix
+    affix           = affix:sub( -1 ) ~= '.' and string.format( '%s.', affix ) or affix
 
     id = isstring( id ) and id or 'noname'
     id = id:gsub( '[%c%s]', '.' )
@@ -169,12 +169,22 @@ function new.rlib( event, ... )
     local arg1  = select( 1, ... )
     local arg2  = select( 2, ... )
 
-    local id = isfunction( arg1 ) and event or isstring( arg1 ) and arg1
-    local fn = isfunction( arg1 ) and arg1 or isstring( arg1 ) and arg2 or nil
+    local id    = isfunction( arg1 ) and event or isstring( arg1 ) and arg1
+    local fn    = isfunction( arg1 ) and arg1 or isstring( arg1 ) and arg2 or nil
+
+    if isstring( id ) then
+        id = gid( id )
+    end
 
     if not isfunction( fn ) then
         base:log( dcat, '[ %s ] :: invalid func\n%s', pkg_name, tostring( trcback ) )
         return
+    end
+
+    if cfg.debug then
+        print( event )
+        print( id )
+        print( '\n\n' )
     end
 
     hook.Add( event, id, fn )
@@ -212,7 +222,8 @@ end
 */
 
 function drop.rlib( event, id )
-    event = gid( event )
+    event   = gid( event )
+    id      = gid( id )
     hook.Remove( event, id )
 end
 

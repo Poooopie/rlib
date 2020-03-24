@@ -202,7 +202,7 @@ function base.calls:load( bPrefix, affix )
     end
 
     if rnet then
-        hook.Run( pid( 'rnet.register' ) )
+        rhook.run.gmod( 'rlib_rnet_register' )
     end
 
     hook.Run( pid( 'calls.post' ) )
