@@ -88,6 +88,7 @@ function rlib.autoload:Run( parent )
         {
             'calc',
             'rnet',
+            'hook',
             'rhook',
             'rcc',
             'timex',

@@ -4177,7 +4177,7 @@ function utils.cc_services( pl, cmd, args )
             id      = lang( 'services_id_udm' ),
             desc    = 'update service runs periodic checks for issues and outdated files',
             chk = function( )
-                if not timex.exists( pid( 'udm.notice' ) ) then return 'stopped' end
+                if not timex.exists( 'rlib_udm_notice' ) then return 'stopped' end
                 return 'running'
             end,
         },
@@ -4706,7 +4706,7 @@ function utils.cc_debug( pl, cmd, args )
         return
     end
 
-    local time_id   = pid( 'debug.delay' )
+    local time_id   = 'rlib_debug_delay'
     local status    = args and args[ 1 ] or false
     local duration  = args and args[ 2 ] or cfg.debug.time_default
 
@@ -4800,7 +4800,7 @@ function utils.cc_debug_status( pl, cmd, args )
     *   functionality
     */
 
-    local dbtimer   = timex.remains( pid( 'debug.delay' ) ) or false
+    local dbtimer   = timex.remains( 'rlib_debug_delay' ) or false
     local status    = cfg.debug.enabled and lang( 'opt_enabled' ) or lang( 'opt_disabled' )
 
     base:log( 1, lang( 'debug_status', status ) )

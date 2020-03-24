@@ -115,7 +115,7 @@ end
 */
 
 function spew.initialize( )
-    timex.simple( prefix .. 'spew.initialize', 3, function( )
+    timex.simple( 'rlib_spew_run', 3, function( )
         if not spew.destroyinit then return end
         hook.Remove( 'ShouldSpew', prefix .. 'spew.enabled' )
         if spew.enabled then

@@ -636,7 +636,7 @@ end
 */
 
 function PANEL:Destroy( )
-    timex.expire( pref( 'timer.update.check' ) )
+    timex.expire( 'rlib_udm_check' )
     ui:destroy( self, true, true )
 end
 

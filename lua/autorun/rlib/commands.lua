@@ -303,8 +303,8 @@ function utils.cc_debug_cleanlogs( pl, cmd, args, str )
     local gcf_cancel    = base.calls:gcflag( 'rlib_debug_clean', 'cancel' )
     local timer_clean   = cfg.debug.clean_delaytime
 
-    if ( arg_param and ( arg_param == gcf_cancel ) or ( arg_param == '-cancel' or arg_param == 'cancel' ) and timex.exists( prefix .. 'debug.doclean' ) ) then
-        timex.expire( prefix .. 'debug.doclean' )
+    if ( arg_param and ( arg_param == gcf_cancel ) or ( arg_param == '-cancel' or arg_param == 'cancel' ) and timex.exists( 'rlib_debug_doclean' ) ) then
+        timex.expire( 'rlib_debug_doclean' )
         base:log( 4, lang( 'logs_clean_cancel' ) )
         return
     end
@@ -316,7 +316,7 @@ function utils.cc_debug_cleanlogs( pl, cmd, args, str )
 
     base:log( 4, lang( 'logs_clean_scheduled', timer_clean, prefix, '-c' ) )
 
-    timex.create( prefix .. 'debug.doclean', timer_clean, 1, function( )
+    timex.create( 'rlib_debug_doclean', timer_clean, 1, function( )
         local files, _ = file.Find( path_logs .. '/*', 'DATA' )
 
         local i_del = 0
@@ -673,7 +673,7 @@ function utils.cc_udm( pl, cmd, args )
     *   functionality
     */
 
-    local timer_id  = prefix .. 'udm.notice'
+    local timer_id  = 'rlib_udm_notice'
     local status    = args and args[ 1 ] or false
     local duration  = args and args[ 2 ] or cfg.udm.checktime or 1800
 
@@ -1687,11 +1687,12 @@ local function restart_cancel( pl )
     local bIsActive = false
     local timers =
     {
-        prefix .. 'timer.srv.restart',
-        prefix .. 'timer.srv.restart.delay',
-        prefix .. 'timer.srv.restart.delay.s1',
-        prefix .. 'timer.srv.restart.delay.s2',
-        prefix .. 'timer.srv.restart.delay.s3.p1'
+        'rlib_cmd_srv_restart',
+        'rlib_cmd_srv_restart_wait',
+        'rlib_cmd_srv_restart_wait_s1',
+        'rlib_cmd_srv_restart_wait_s2',
+        'rlib_cmd_srv_restart_wait_s3_p1',
+        'rlib_cmd_srv_restart_wait_s3_p2',
     }
 
     for v in helper.get.data( timers ) do
@@ -1762,15 +1763,14 @@ function utils.cc_restart( pl, cmd, args )
         return false
     end
 
-    if not timex.exists( prefix .. 'timer.srv.restart' ) then
+    if not timex.exists( 'rlib_cmd_srv_restart' ) then
         local admin_name = base:isconsole( pl ) and lang( 'console' ) or pl:Name( )
 
         storage:log( 7, false, '[ %s ] » forced a server restart', admin_name )
         rlib:log( 4, '[ %s ] » forced a server restart', admin_name )
 
-        timex.create( prefix .. 'timer.srv.restart', restart_timer, 1, function( )
+        timex.create( 'rlib_cmd_srv_restart', restart_timer, 1, function( )
             rlib:log( 4, lang( 'restart_now' ) )
-            for v in helper.get.ents( ) do v:SetPos( Vector( 99999999999999999, 0, 0 ) ) end
         end )
 
         base.msg:route( nil, true, script, 'Server restart in', cfg.cmsg.clrs.target_tri, tostring( restart_timer ), cfg.cmsg.clrs.msg, 'seconds' )
@@ -1836,7 +1836,7 @@ function utils.cc_timed_restart( pl, cmd, args )
 
     local step2_OK, step3_OK = false, false
 
-    if not timex.exists( prefix .. 'timer.srv.restart.delay' ) then
+    if not timex.exists( 'rlib_cmd_srv_restart_delay' ) then
 
         local admin_name = base:isconsole( pl ) and lang( 'console' ) or pl:Name( )
 
@@ -1845,7 +1845,7 @@ function utils.cc_timed_restart( pl, cmd, args )
         storage:log( 7, false, '[ %s ] has forced a timed server restart in [ %i ] seconds', admin_name, arg_time )
 
         -- overall timer action to execute when timer runs out
-        timex.create( prefix .. 'timer.srv.restart.delay', arg_time, 1, function( )
+        timex.create( 'rlib_cmd_srv_restart_delay', arg_time, 1, function( )
             rlib:log( 4, lang( 'restart_now' ) )
             for v in helper.get.ents( ) do v:SetPos( Vector( 99999999999999999, 0, 0 ) ) end
             hook.Remove( 'Tick', prefix .. 'timer.srv.restart' )
@@ -1853,8 +1853,8 @@ function utils.cc_timed_restart( pl, cmd, args )
 
         local function restart_execute( )
             local exec_cd = timex_cd
-            if not timex.exists( prefix .. 'timer.srv.restart.delay.s3.part2' ) then
-                timex.create( prefix .. 'timer.srv.restart.delay.s3.part2', 1, timex_cd, function( )
+            if not timex.exists( 'rlib_cmd_srv_restart_wait_s3_p2' ) then
+                timex.create( 'rlib_cmd_srv_restart_wait_s3_p2', 1, timex_cd, function( )
                     if exec_cd ~= 11 then
                         local term = ( exec_cd == 1 ) and 'second' or 'seconds'
                         if ULib then ULib.csay( _, 'Server restart in [ ' .. tostring( exec_cd ) .. ' ] ' .. term ) end
@@ -1867,19 +1867,19 @@ function utils.cc_timed_restart( pl, cmd, args )
         end
 
         hook.Add( 'Tick', prefix .. 'timer.srv.restart', function( )
-            local timex_remains    = timex.remains( prefix .. 'timer.srv.restart.delay' )
-            timex_remains = math.Round( timex_remains )
+            local timex_remains    = timex.remains( 'rlib_cmd_srv_restart_wait' )
+            timex_remains           = math.Round( timex_remains )
 
-            if ( timex_remains == time_step2 and not step2_OK ) and not timex.exists( prefix .. 'timer.srv.restart.delay.s2' ) then
-                timex.create( prefix .. 'timer.srv.restart.delay.s2', 0.01, 1, function( )
+            if ( timex_remains == time_step2 and not step2_OK ) and not timex.exists( 'rlib_cmd_srv_restart_wait_s2' ) then
+                timex.create( 'rlib_cmd_srv_restart_wait_s2', 0.01, 1, function( )
                     base.msg:route( nil, true, script, 'Server restart in', cfg.cmsg.clrs.target_tri, tostring( time_step2 ), cfg.cmsg.clrs.msg, 'seconds' )
                     rlib:log( 4, 'Server restart in [ %s ] seconds', tostring( time_step2 ) )
                     step2_OK = true
                 end )
             end
 
-            if ( timex_remains == timex_cd and not step3_OK ) and not timex.exists( prefix .. 'timer.srv.restart.delay.s3.p1' ) then
-                timex.create( prefix .. 'timer.srv.restart.delay.s3.p1', 0.01, 1, function( )
+            if ( timex_remains == timex_cd and not step3_OK ) and not timex.exists( 'rlib_cmd_srv_restart_wait_s3_p1' ) then
+                timex.create( 'rlib_cmd_srv_restart_wait_s3_p1', 0.01, 1, function( )
                     step3_OK = true
                     hook.Remove( 'Tick', prefix .. 'timer.srv.restart' )
                     restart_execute( )

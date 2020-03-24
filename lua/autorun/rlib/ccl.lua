@@ -747,7 +747,7 @@ net.Receive( 'rlib.debug.listener', netlib_debug_listener )
 */
 
 local function initialize( )
-    timex.simple( pid( '__gm.initialize' ), 1, function( )
+    timex.simple( pid( '__gm_initialize' ), 1, function( )
         for l, m in SortedPairs( base.w ) do
             steamworks.FileInfo( l, function( res )
                 if not res or not res.title then return end

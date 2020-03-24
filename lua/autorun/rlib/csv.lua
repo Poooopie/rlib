@@ -385,7 +385,7 @@ local run_check_update = coroutine.create( function( )
     while ( true ) do
         base.udm:check( )
     end
-    timex.expire( pid( 'udm.notice' ) )
+    timex.expire( 'rlib_udm_notice' )
 end )
 
 /*
@@ -396,7 +396,7 @@ end )
 
 function base.udm:Run( dur )
     local tmr_check = isnumber( dur ) and dur or cfg.udm.checktime or 1800
-    timex.create( pid( 'udm.notice' ), tmr_check, 0, function( )
+    timex.create( 'rlib_udm_notice', tmr_check, 0, function( )
         coroutine.resume( run_check_update )
     end )
 end
@@ -700,7 +700,7 @@ local function rdo_rendermode( bEnabled )
         mode = RENDERMODE_TRANSALPHA
     end
 
-    timex.simple( pid( 'rdo.rendermode' ), 2, function( )
+    timex.simple( 'rlib_rdo_rendermode', 2, function( )
         if not cfg.rdo.enabled then bEnabled = false end
         local state = bEnabled and lang( 'opt_enabled' ) or lang( 'opt_disabled' )
         rlib:log( RLIB_LOG_SYSTEM, lang( 'rdo_set', state ) )
@@ -800,7 +800,7 @@ function base:setup( )
     */
 
     local function noroot_notice( )
-        timex.create( pid( '__lib.noroot.notice.timer' ), 120, 0, function( )
+        timex.create( pid( '__lib_noroot_notice' ), 120, 0, function( )
             base.msg:direct( nil, script, lang( 'lib_setup_chat_1' ), cfg.cmsg.clrs.target_sec, sf( ' ?%s ', lang( 'perms_flag_setup' ) ), cfg.cmsg.clrs.msg, lang( 'lib_setup_chat_2' ) )
         end )
         hook.Remove( 'Think', pid( '__lib.noroot.notice' ) )
@@ -815,7 +815,7 @@ end
 */
 
 function base:setup_killtask( )
-    timex.expire( pid( '__lib.noroot.notice.timer' ) )
+    timex.expire( pid( '__lib_noroot_notice' ) )
     hook.Remove( 'Think', pid( '__lib.noroot.notice' ) )
 end
 
@@ -828,7 +828,7 @@ end
 */
 
 local function initialize( )
-    timex.simple( pid( '__gm.initialize' ), 0, function( )
+    timex.simple( pid( '__gm_initialize' ), 0, function( )
         base.udm:Run( )
 
         if cfg.rdo.enabled then
@@ -841,12 +841,12 @@ local function initialize( )
         end
 
         -- will start after first player connects
-        timex.simple( pid( '__gm.initialize.udm' ), 3, function( )
+        timex.simple( pid( '__gm_initialize_udm' ), 3, function( )
             coroutine.resume( run_check_update )
         end )
 
         -- setup
-        timex.simple( pid( '__gm.initialize.setup' ), 5, function( )
+        timex.simple( pid( '__gm_initialize_setup' ), 5, function( )
             base:setup( )
         end )
 
@@ -1127,7 +1127,7 @@ hook.Add( 'ShutDown', pid( 'server.shutdown' ), shutdown )
 */
 
 local function onPlayerSpawn( pl )
-    timex.simple( pid( 'pl.spawn' ), 3, function( )
+    timex.simple( 'rlib_pl_spawn', 3, function( )
         if not helper.ok.ply( pl ) then return end
 
         if helper:cvar_bool( 'rlib_pco_autogive' ) then
@@ -1848,7 +1848,7 @@ end
 */
 
 function tools.rdo:Run( )
-    timex.simple( pid( 'rdo.initialize' ), 5, function( )
+    timex.simple( 'rlib_rdo_initialize', 5, function( )
         if not cfg.rdo.enabled then return end
         rdo_rendermode( cfg.rdo.enabled )
     end )
@@ -2432,3 +2432,5 @@ local function tools_mviewer_ps_toggle( pl, text )
     return ''
 end
 hook.Add( 'PlayerSay', pid( 'tools.mviewer.psay.toggle' ), tools_mviewer_ps_toggle )
+
+PrintTable( hook )

@@ -108,15 +108,10 @@ function PANEL:Init( )
     self.svg_w                  = 100
 
     /*
-    *   display parent :: static || animated
+    *   animation
     */
 
-    if helper:cvar_bool( 'rlib_animations_enabled' ) then
-        self:SetPos( ( ScrW( ) / 2 ) - ( ui_w / 2 ), ScrH( ) + ui_h )
-        self:MoveTo( ( ScrW( ) / 2 ) - ( ui_w / 2 ), ( ScrH( ) / 2 ) - (  ui_h / 2 ), 0.4, 0, -1 )
-    else
-        self:SetPos( ( ScrW( ) / 2 ) - ( ui_w / 2 ), ( ScrH( ) / 2 ) - (  ui_h / 2 ) )
-    end
+    ui:pos_center( self )
 
     /*
     *   titlebar
@@ -363,23 +358,23 @@ function PANEL:Init( )
                                 :logic( function( s )
                                     if not ui:valid( s ) then return end
                                     if not mf.astra.oort_status then return end
-                                    if not timex.exists( pref( 'about.indicator.l1.r1' ) ) then
-                                        timex.create( pref( 'about.indicator.l1.r1' ), math.random( 0.5, 1 ), 1, function( )
+                                    if not timex.exists( 'rlib_about_indic_l1_r1' ) then
+                                        timex.create( 'rlib_about_indic_l1_r1', math.random( 0.5, 1 ), 1, function( )
                                             clr_box = Color( 46, 46, 50, 255 )
                                         end )
-                                        if not timex.exists( pref( 'about.indicator.l1.r2' ) ) then
-                                            timex.create( pref( 'about.indicator.l1.r2' ), math.random( 0.5, 1 ), 1, function( )
+                                        if not timex.exists( 'rlib_about_indic_l1_r2' ) then
+                                            timex.create( 'rlib_about_indic_l1_r2', math.random( 0.5, 1 ), 1, function( )
                                                 clr_box2 = Color( 46, 46, 50, 255 )
                                             end )
                                         end
                                     end
 
-                                    if not timex.exists( pref( 'about.indicator.l2.r1' ) ) then
-                                        timex.create( pref( 'about.indicator.l2.r1' ), math.random( 0.5, 3 ), 1, function( )
+                                    if not timex.exists( 'rlib_about_indic_l2_r1' ) then
+                                        timex.create( 'rlib_about_indic_l2_r1', math.random( 0.5, 3 ), 1, function( )
                                             clr_box = Color( 255, 50, 50, 255 )
                                         end )
-                                        if not timex.exists( pref( 'about.indicator.l2.r2' ) ) then
-                                            timex.create( pref( 'about.indicator.l2.r2' ), math.random( 0.5, 3 ), 1, function( )
+                                        if not timex.exists( 'rlib_about_indic_l2_r2' ) then
+                                            timex.create( 'rlib_about_indic_l2_r2', math.random( 0.5, 3 ), 1, function( )
                                                 clr_box2 = Color( 255, 50, 50, 255 )
                                             end )
                                         end
@@ -393,7 +388,7 @@ function PANEL:Init( )
     *   if updates are needed
     */
 
-    timex.create( pref( 'timer.update.check' ), 30, 0, function( )
+    timex.create( 'rlib_udm_check', 30, 0, function( )
 
         /*
         *   network update check
@@ -410,7 +405,7 @@ function PANEL:Init( )
     *   initialize timer
     */
 
-    timex.simple( pref( 'about.initialize' ), 3, function( )
+    timex.simple( 'rlib_about_run', 3, function( )
         if not ui:valid( self ) then return end
         if not mf.astra.is_latest then
             ui:show( self.p_status )
@@ -589,7 +584,7 @@ end
 */
 
 function PANEL:Destroy( )
-    timex.expire( pref( 'timer.update.check' ) )
+    timex.expire( 'rlib_udm_check' )
     ui:destroy( self, true, true )
 end
 
