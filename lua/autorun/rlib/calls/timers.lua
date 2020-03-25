@@ -51,4 +51,5 @@ base.c.timers =
     [ 'rlib_about_indic_l2_r1' ]                = { 'rlib.about.indic.l2.r1' },
     [ 'rlib_about_indic_l2_r2' ]                = { 'rlib.about.indic.l2.r2' },
     [ 'rlib_spew_run' ]                         = { 'rlib.spew.run' },
+    [ 'rcore_modules_validate' ]                = { 'rcore.modules.validate' },
 }

@@ -190,7 +190,7 @@ rhook.new.rlib( 'rcore_modules_load_post', 'rcore_modules_writedata', function( 
 */
 
 function base:module_validate( source, bBypass )
-    timex.simple( pid( 'modules.validate' ), 0, function( )
+    timex.simple( 'rcore_modules_validate', 0, function( )
         if source and not istable( source ) then
             local trcback = debug.traceback( )
             rlib:log( 2, 'cannot validate module, bad table\n[%s]', trcback )
@@ -250,7 +250,11 @@ function base:module_validate( source, bBypass )
             end
 
             if bHasError then
+                rlib:log( 0 )
+                rlib:log( 2, '--------------------------------------------------------------------------------' )
                 rlib:log( 2, lang( 'module_outdated', v.name, rlib_mf.name, rlib_mf.site ) )
+                rlib:log( 2, '--------------------------------------------------------------------------------' )
+                rlib:log( 0 )
                 v.errorlog = v.errorlog or { }
                 v.errorlog.bLibOutdated = true
             end

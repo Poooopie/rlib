@@ -613,7 +613,7 @@ end
 
 function base:bValidLanguage( str )
     if not str then return false end
-    if str:gmatch( '^(%l+_%l+)$' ) then return true end
+    if str:gmatch( '^(%l+_%l+)$' ) then return true end -- '
 
     return false
 end

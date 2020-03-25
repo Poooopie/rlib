@@ -214,26 +214,13 @@ function PANEL:Init( )
     *   svg :: objects
     */
 
+    local margin                = self:GetWide( ) / 2 - 70
+
     self.svg_updated            = ui.new( 'rlib.lo.svg.c', self.p_tags )
-    :static                     ( LEFT                              )
-    :margin                     ( 0                                 )
+    :static                     ( FILL                              )
+    :margin                     ( margin, 0, margin, 0              )
     :tall                       ( 20                                )
-    :wide                       ( self.svg_w + 21                   )
     :param                      ( 'SetImg', mf.astra.svg.updated    )
-
-    self.svg_size               = ui.new( 'rlib.lo.svg.c', self.p_tags )
-    :static                     ( LEFT                              )
-    :margin                     ( 0                                 )
-    :tall                       ( 20                                )
-    :wide                       ( self.svg_w                        )
-    :param                      ( 'SetImg', mf.astra.svg.size       )
-
-    self.svg_stats              = ui.new( 'rlib.lo.svg.c', self.p_tags )
-    :static                     ( LEFT                              )
-    :margin                     ( 0, 0, 0, 1                        )
-    :tall                       ( 20                                )
-    :wide                       ( self.svg_w                        )
-    :param                      ( 'SetImg', mf.astra.svg.stats      )
 
     /*
     *   status :: label
