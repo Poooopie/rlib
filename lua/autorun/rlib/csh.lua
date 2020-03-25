@@ -1514,7 +1514,7 @@ function access:allow_throwExcept( pl, perm, mod, msg )
     local bChk = self:allow( pl, perm, mod )
     if not bChk then
         msg = isstring( msg ) and msg or 'You lack permission to'
-        base.msg:target( pl, mod.name, msg, cfg.cmsg.clrs.target_tri, tostring( perm ) )
+        base.msg:target( pl, ( mod and mod.name ) or mf.name, msg, cfg.cmsg.clrs.target_tri, tostring( perm ) )
         return false
     end
 
@@ -1537,7 +1537,7 @@ function access:strict_throwExcept( pl, perm, mod, msg )
     local bChk = self:strict( pl, perm, mod )
     if not bChk then
         msg = isstring( msg ) and msg or 'You lack permission to'
-        base.msg:target( pl, mod.name, msg, cfg.cmsg.clrs.target_tri, tostring( perm ) )
+        base.msg:target( pl, ( mod and mod.name ) or mf.name, msg, cfg.cmsg.clrs.target_tri, tostring( perm ) )
         return false
     end
 
