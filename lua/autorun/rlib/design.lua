@@ -506,7 +506,7 @@ function design.text_adv( text, x, y, clr, fnt, align_x )
     for str in string.gmatch( text, '[^\n]*' ) do
         if #str > 0 then
             if string.find( str, '\t' ) then
-                for tabs, str_alt in string.gmatch( str, '(\t*)([^\t]*)' ) do
+                for tabs, str_alt in string.gmatch( str, '(\t*)([^\t]*)' ) do --'
                     pos_x = math.ceil( ( pos_x + tab_w * math.max( #tabs - 1, 0 ) ) / tab_w ) * tab_w
 
                     if #str_alt > 0 then

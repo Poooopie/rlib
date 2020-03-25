@@ -170,7 +170,7 @@ local pmeta = FindMetaTable( 'Player' )
 
 function base:broadcast( ... )
     local args      = { ... }
-    net.Start       ( 'rlib.sms.notify'     )
+    net.Start       ( 'rlib.sms.umsg'       )
     net.WriteTable  ( args                  )
     net.Broadcast   (                       )
 end

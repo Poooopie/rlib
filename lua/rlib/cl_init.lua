@@ -34,6 +34,7 @@ local pf                = base.manifest.prefix
 
 local helper            = rlib.h
 local access            = rlib.a
+local design            = rlib.d
 
 /*
 *   Localized translation func
