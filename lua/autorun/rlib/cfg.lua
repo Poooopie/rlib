@@ -343,7 +343,7 @@ end
             {
                 enabled     = true,
                 key1        = 79,   -- key: shift
-                key2        = 58,   -- key: comma
+                key2        = 37,   -- key: comma
                 chat        =
                 {
                     [ '!rcfg' ]     = true,

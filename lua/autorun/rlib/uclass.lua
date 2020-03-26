@@ -398,7 +398,7 @@ function ui:cscale( bSimple, i800, i1024, i1280, i1366, i1600, i1920, i2xxx )
     elseif ScrW( ) > 1600 and ScrW( ) <= 1920 then
         return bSimple and i1920 or ScreenScale( i1920 )
     elseif ScrW( ) > 1920 then
-        return bSimple and i2xxx or self:scale640( i1920, 1920 )
+        return bSimple and i2xxx or self:Scale640( i1920, 1920 )
     end
 end
 
@@ -458,7 +458,7 @@ function ui:SmartScale_Strict( bSimple, i800, i1024, i1280, i1366, i1600, i1920,
     elseif ScrW( ) > 1600 and ScrW( ) <= 1920 then
         return bSimple and i1920 or ScreenScale( i1920 )
     elseif ScrW( ) > 1920 then
-        return bSimple and i2560 or self:scale640( i2560, 2560 )
+        return bSimple and i2560 or self:Scale640( i2560, 2560 )
     end
 end
 

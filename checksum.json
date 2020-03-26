@@ -1,5 +1,5 @@
 {
-  "autorun/rlib/_autoloader.lua": "3dee65dc191d1eab203a83014c896a5b69d1d519",
+  "autorun/rlib/_autoloader.lua": "eafeddb0bbc798237276f935ef9b803de8745e72",
   "autorun/rlib/calls/timers.lua": "fbc340bd9f432e5a55cf6058fa482d0a0bb44ecd",
   "autorun/rlib/register.lua": "ee54671e7cfcb4ca842041f4978a33e6fe5f9a14",
   "autorun/rlib/obj/obj_overlay.lua": "3e81a6ac643733cf56247df4f6b84360d8eddbb5",
@@ -13,7 +13,7 @@
   "autorun/rlib/packages/timex.lua": "0a2daee8f70843a8a7c549d2b785a71b54bc2d22",
   "autorun/rlib/packages/spew.lua": "87b55090f87b4a325bdcdf4df139ca4d1421b57f",
   "autorun/rlib/obj/obj_dlist.lua": "a24d90cf5e64a367a7f87db08ecbb6c02c13dbe7",
-  "autorun/rlib/cfg.lua": "bb68a14897d5b94fe3bb72a414d90a45190739c4",
+  "autorun/rlib/cfg.lua": "f5a0b3f2e249240029aa90130990fe23acefadba",
   "autorun/rlib/packages/rnet.lua": "3afec8484cedb02c29fecde6c2d8daa8e14ab16f",
   "autorun/rlib/pmeta.lua": "90304ee0c218a96d226757d1535ff21f8b423f46",
   "autorun/rlib/packages/rcc.lua": "185751da45e91f89615be39fa5412c3d5fa8abde",
@@ -52,5 +52,5 @@
   "autorun/rlib/layout/rlib_lo_konsole.lua": "b329437fb19784f322fb275e5cbd3c7a67670e4b",
   "autorun/rlib/patches.lua": "d0e70b08e3e6a832f3b54afe0e549a7b99f6cb02",
   "autorun/rlib/csh.lua": "f0dee19c1c4ecb66156971085cd0cbbde7dc01ff",
-  "autorun/rlib/uclass.lua": "a2d7762a98f7b36a5602402a22f76a7834b74683"
+  "autorun/rlib/uclass.lua": "c0eaaa3079229ba5975c24641dc10f6e78124a40"
 }
