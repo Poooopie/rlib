@@ -899,7 +899,8 @@ function helper.get.id( ... )
     local args          = { ... }
     local resp          = table.concat( args, '_' )
     resp                = resp:lower( )
-    resp                = resp:gsub( '[%p%c%s]', '.' )
+    resp                = resp:gsub( '[%p%c]', '.' )
+    resp                = resp:gsub( '[%s]', '_' )
 
     return resp
 end
@@ -1133,6 +1134,7 @@ function access:getperm( perm, mod )
     end
     return not mod and perm or ( isstring( mod ) and rcore.modules[ mod ] and rcore.modules[ mod ].permissions[ perm ] ) or ( istable( mod ) and mod.permissions[ perm ] )
 end
+access.gperm = access.getperm
 
 /*
 *   access :: get perm :: id
@@ -1140,6 +1142,7 @@ end
 *   returns the name or id of a permission
 *
 *   @call   : access:getperm_id( perm, mod )
+*           : access:pid( perm, mod )
 *
 *   @param  : str perm
 *   @param  : str, tbl mod
@@ -1155,6 +1158,7 @@ function access:getperm_id( perm, mod )
     local permission = not mod and perm or ( isstring( mod ) and rcore.modules[ mod ] and rcore.modules[ mod ].permissions[ perm ] ) or ( istable( mod ) and mod.permissions[ perm ] )
     return ( permission and ( permission.name or permission.id ) or perm )
 end
+access.pid = access.getperm_id
 
 /*
 *   access :: ulx

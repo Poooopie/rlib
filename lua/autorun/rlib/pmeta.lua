@@ -197,7 +197,8 @@ end
 *   helper :: association id
 *
 *   makes an id based on the specified ply unique id
-*   all special characters and spaces are replaced with [ . ] char
+*       : special chars     => [ . ]
+*       : spaces            => [ _ ]
 *
 *   @note   : non-ply associated func helper.get.id( ... )
 *
@@ -218,7 +219,40 @@ function pmeta:aid( ... )
 
     local resp          = table.concat( args, '_' )
     resp                = resp:lower( )
-    resp                = resp:gsub( '[%p%c%s]', '.' )
+    resp                = resp:gsub( '[%p%c]', '.' )
+    resp                = resp:gsub( '[%s]', '_' )
+
+    return resp
+end
+
+/*
+*   helper :: association id :: 64
+*
+*   makes an id based on the specified ply unique id
+*       : special chars     => [ . ]
+*       : spaces            => [ _ ]
+*
+*   @note   : non-ply associated func helper.get.id( ... )
+*
+*   @ex     : timer_id = pl:aid64( mod.id, 'dc', 'string name id' )
+*   @res    : xtask.dc.string_name_id.76561198321000000
+*
+*   @param  : varg { ... }
+*   @return : str
+*/
+
+function pmeta:aid64( ... )
+    if not helper.ok.ply( self ) then return end
+
+    local pl            = self:sid( )
+    local args          = { ... }
+
+    table.insert        ( args, pl )
+
+    local resp          = table.concat( args, '_' )
+    resp                = resp:lower( )
+    resp                = resp:gsub( '[%p%c]', '.' )
+    resp                = resp:gsub( '[%s]', '_' )
 
     return resp
 end
