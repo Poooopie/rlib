@@ -701,7 +701,15 @@ function base:log( mod, cat, msg, ... )
     local c_comp    = sf( '%s %s %s', c_date, c_type, msg )
 
     local _stdir    = storage.mft:getpath( 'dir_modules' )
-    storage.file.append( _stdir .. '/' .. mod_data.id .. '/logs', f_name, c_comp )
+    local i_boot    = sys.startups or 0
+
+    if i_boot == 0 or i_boot == '0' then
+        i_boot = '#boot'
+    end
+
+    local lpath     = sf( '%s/%s/logs/%s', _stdir, mod_data.id, path, i_boot )
+
+    storage.file.append( lpath, f_name, c_comp )
 
     if bPostnow then
         konsole:add_simple( cat, msg )

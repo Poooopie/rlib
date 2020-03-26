@@ -1466,9 +1466,16 @@ function storage:log( cat, bKonsole, msg, ... )
 
     local when          = '[' .. os.date( '%I:%M:%S' ) .. ']'
     local resp          = sf( '%s %s %s', when, c_type, msg )
+    local i_boot        = sys.startups or 0
 
-    storage.dir.create  ( path_server )
-    storage.file.append ( path_server, m_id, resp )
+    if i_boot == 0 or i_boot == '0' then
+        i_boot = '#boot'
+    end
+
+    local path          = sf( '%s/%s', path_server, i_boot )
+
+    storage.dir.create  ( path )
+    storage.file.append ( path, m_id, resp )
 
     if bKonsole then
         konsole:add_simple( cat, msg )
@@ -1511,14 +1518,21 @@ function storage:logconn( cat, bKonsole, msg, ... )
         c_type      = '[' .. cat .. ']'
     end
 
-    local m_pf      = os.date( '%m%d%Y' )
-    local m_id      = sf( 'RL_%s.txt', m_pf )
+    local m_pf          = os.date( '%m%d%Y' )
+    local m_id          = sf( 'RL_%s.txt', m_pf )
 
-    local when      = '[' .. os.date( '%I:%M:%S' ) .. ']'
-    local resp      = sf( '%s %s %s', when, c_type:upper( ), msg )
+    local when          = '[' .. os.date( '%I:%M:%S' ) .. ']'
+    local resp          = sf( '%s %s %s', when, c_type:upper( ), msg )
+    local i_boot        = sys.startups or 0
 
-    storage.dir.create( path_uconn )
-    storage.file.append( path_uconn, m_id, resp )
+    if i_boot == 0 or i_boot == '0' then
+        i_boot = '#boot'
+    end
+
+    local path          = sf( '%s/%s', path_uconn, i_boot )
+
+    storage.dir.create  ( path )
+    storage.file.append ( path, m_id, resp )
 
     if bKonsole then
         konsole:add_simple( cat, msg )
@@ -1754,22 +1768,22 @@ local function logs_initialize( )
     *   logs dir diskspace and file count
     */
 
-    sys.log_sz, sys.log_ct = calc.fs.diskTotal( path_logs )
+    sys.log_sz, sys.log_ct, sys.log_fol_ct = calc.fs.diskTotal( path_logs )
 
     /*
     *   uconn dir diskspace and file count
     */
 
-    sys.uconn_sz, sys.uconn_ct = calc.fs.diskTotal( path_uconn )
+    sys.uconn_sz, sys.uconn_ct, sys.uconn_fol_ct = calc.fs.diskTotal( path_uconn )
 
     /*
     *   diskspace usage msg
     */
 
-    if sys.log_ct > cfg.debug.clean_threshold then
-        base:log( 3, lang( 'logs_clean_threshold', cfg.debug.clean_threshold, path_logs, sys.log_sz, 'rlib.debug.cleanlogs' ) )
+    if sys.log_fol_ct > cfg.debug.clean_threshold then
+        base:log( 3, lang( 'logs_clean_threshold', sys.log_ct, sys.log_fol_ct, path_logs, sys.log_sz, 'rlib.debug.cleanlogs' ) )
     else
-        base:log( RLIB_LOG_SYSTEM, lang( 'logs_dir_size', sys.log_ct, path_logs, sys.log_sz ) )
+        base:log( RLIB_LOG_SYSTEM, lang( 'logs_dir_size', sys.log_ct, sys.log_fol_ct, path_logs, sys.log_sz ) )
     end
 
 end
@@ -1833,7 +1847,15 @@ function konsole:log( path, cat, data )
     local when      = '[' .. os.date( '%I:%M:%S' ) .. ']'
     local resp      = sf( '%s %s %s', when, c_type, data )
 
-    storage.file.append( path, m_id, resp )
+    local i_boot    = sys.startups or 0
+
+    if i_boot == 0 or i_boot == '0' then
+        i_boot = '#boot'
+    end
+
+    local lpath     = sf( '%s/%s', path, i_boot )
+
+    storage.file.append( lpath, m_id, resp )
 end
 
 /*

@@ -215,17 +215,32 @@ end
 function fs.diskTotal( path )
     local files, _      = file.Find( path .. '/*', 'DATA' )
     local ct_files      = #files or 0
+    local ct_folders    = #_
     local ct_size       = 0
 
-    for k, v in pairs( files ) do
-        local file_path = sf( '%s/%s', path, v )
-        local file_size = file.Size( file_path, 'DATA' )
-        ct_size         = ct_size + file_size
+    local function recurv( path_sub )
+        local sub_path      = path .. '/' .. path_sub
+        local ifiles, _     = file.Find( sub_path .. '/*', 'DATA' )
+        ct_files            = ct_files + #ifiles
+
+        for k, v in pairs( ifiles ) do
+            local file_path = sf( '%s/%s', sub_path, v )
+            local file_size = file.Size( file_path, 'DATA' )
+            ct_size         = ct_size + file_size
+        end
+    end
+
+    /*
+    *   add folders
+    */
+
+    for _, v in pairs( _ ) do
+        recurv( v )
     end
 
     local sz_output   = fs.size( ct_size )
 
-    return sz_output, ct_files
+    return sz_output, ct_files, ct_folders
 end
 
 /*
