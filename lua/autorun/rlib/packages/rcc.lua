@@ -33,8 +33,8 @@ local script            = mf.name
     {
         author          = 'richard',
         desc            = 'console commands',
-        build           = 121919.1,
-        version         = '1.0.0',
+        build           = 032620,
+        version         = { 2, 0, 0 },
         debug_id        = 'rcc.debug.delay',
     }
 

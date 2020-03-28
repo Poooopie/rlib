@@ -82,12 +82,12 @@ local function pid( str, suffix )
 end
 
 /*
-*   stats :: initialize
+*   initialize :: stats
 *
 *   tracks the number of enabled modules as well as the disabled ones
 */
 
-local function stats_initialize( )
+local function initialize_stats( )
     if not rlib.settings.debug.stats then return end
 
     rlib:log( 0 )
@@ -98,7 +98,7 @@ local function stats_initialize( )
 
     sys.starttime = timex.secs.benchmark( SysTime( ) )
 end
-rhook.new.rlib( 'rlib_initialize_post', 'rcore_server_initialize', stats_initialize )
+hook.Add( pid( 'initialize.post', rlib_mf.prefix ), pid( 'server.initialize' ), initialize_stats )
 
 /*
 *   modules :: write data
@@ -287,153 +287,3 @@ function base:modules_perms_register( source )
     end
 end
 rhook.new.gmod( 'PostGamemodeLoaded', 'rcore_modules_perms_register', function( source ) base:modules_perms_register( source ) end )
-
-/*
-*   concommand :: reload
-*
-*   various tasks that can be completed via console commands
-*   note that most of these require you to have root permissions with
-*   rlib otherwise you wont be able to return the requested info.
-*/
-
-/*
-*   concommand :: reload rcore
-*/
-
-function base.cc_reload( pl, cmd, args )
-
-    local ccmd = rlib.calls:get( 'commands', 'rcore_reload' )
-
-    if ( ccmd.scope == 1 and not rlib:isconsole( pl ) ) then
-        access:deny_consoleonly( pl, base.manifest.name, ccmd.id )
-        return
-    end
-
-    if not access:bIsRoot( pl ) then
-        access:deny_permission( pl, base.manifest.name, ccmd.id )
-        return
-    end
-
-    rcore.autoload:Run( )
-
-    rlib.msg:route( pl, false, rlib_mf.name, 'Successfully reloaded', rlib.settings.cmsg.clrs.target, rcore.manifest.name )
-
-end
-
-/*
-*   concommand :: list modules
-*
-*   prints all currently running modules on server in console
-*/
-
-function base.cc_modules( pl, cmd, args )
-
-    local ccmd = rlib.calls:get( 'commands', 'rcore_modules' )
-
-    if ( ccmd.scope == 1 and not rlib:isconsole( pl ) ) then
-        access:deny_consoleonly( pl, base.manifest.name, ccmd.id )
-        return
-    end
-
-    if not access:bIsRoot( pl ) then
-        access:deny_permission( pl, base.manifest.name, ccmd.id )
-        return
-    end
-
-    /*
-    *   declarations
-    */
-
-    local arg_param     = args and args[ 1 ] or false
-    local gcf_paths     = rlib.calls:gcflag( 'rcore_modules', 'paths' )
-
-    /*
-    *   functionality
-    */
-
-    local output = '\n\n [' .. base.manifest.name .. '] Active Modules\n\n'
-    output = output .. sf( '%-70s', '--------------------------------------------------------------------------------------------\n' )
-    local c1_lbl = sf( '%-20s', 'Module'      )
-    local c2_lbl = sf( '%-15s', 'Version'     )
-    local c3_lbl = sf( '%-15s', 'Author'      )
-    local c4_lbl = sf( '%-20s', ( arg_param == gcf_paths and 'Path' ) or 'Description' )
-    local c5_lbl = sf( '%-70s', '--------------------------------------------------------------------------------------------' )
-    output = output .. sf( ' %s %s %s %s\n%s\n', c1_lbl, c2_lbl, c3_lbl, c4_lbl, c5_lbl )
-
-    rlib:console( pl, output )
-
-    for v in helper.get.data( base.modules, true ) do
-        local c1_data, c2_data, c3_data, c4_data, output_data = '', '', '', '', ''
-        c1_data = sf( '%-20s', tostring( helper.str:truncate( v.name, 20, '...' ) or 'err' ) )
-        c2_data = sf( '%-15s', tostring( base:module_ver2str( v ) or 'err' ) )
-        c3_data = sf( '%-15s', tostring( v.author or 'err' ) )
-        c4_data = sf( '%-20s', tostring( helper.str:truncate( ( arg_param == gcf_paths and v.path ) or v.desc, 40, '...' ) or 'err' ) )
-        output_data = output_data .. sf( ' %s %s %s %s', c1_data, c2_data, c3_data, c4_data )
-
-        rlib:console( pl, Color( 255, 255, 0 ), output_data )
-    end
-
-    rlib:console( pl, '\n--------------------------------------------------------------------------------------------' )
-
-end
-
-/*
-*   concommand :: error logs
-*
-*   displays any registered errors with the specified module
-*/
-
-function base.cc_errlog( pl, cmd, args )
-
-    local ccmd = rlib.calls:get( 'commands', 'rcore_errorlog' )
-
-    if ( ccmd.scope == 1 and not rlib:isconsole( pl ) ) then
-        access:deny_consoleonly( pl, base.manifest.name, ccmd.id )
-        return
-    end
-
-    if not access:bIsRoot( pl ) then
-        access:deny_permission( pl, base.manifest.name, ccmd.id )
-        return
-    end
-
-    /*
-    *   functionality
-    */
-
-    rlib:console( pl, '\n' )
-    rlib:console( pl, Color( 255, 255, 0 ), rlib.manifest.name, Color( 255, 0, 255 ), ' » ', Color( 255, 255, 255 ), 'Errorlogs' )
-    rlib:console( pl, lang( 'sym_sp' ) )
-
-    /*
-    *   outdated libraries
-    */
-
-    rlib:console( pl, Color( 255, 255, 0 ), '» ', Color( 255, 255, 255 ), 'Outdated\n' )
-    rlib:console( pl, Color( 255, 255, 255 ), 'The following modules require a more recent version of rlib to function properly' )
-    rlib:console( pl, lang( 'sym_sp' ) )
-    rlib:console( pl, 0 )
-
-    local c1_lbl    = sf( '%-20s', 'Module'         )
-    local c2_lbl    = sf( '%-20s', 'Module Version' )
-    local c3_lbl    = sf( '%-20s', 'Lib Version'   )
-    local c4_lbl    = sf( '%-20s', 'Lib Required'  )
-
-    rlib:console( pl, Color( 255, 255, 0 ), c1_lbl, Color( 255, 255, 255 ), c2_lbl, Color( 255, 0, 0 ), c3_lbl, Color( 255, 255, 255 ), c4_lbl )
-    rlib:console( pl, lang( 'sym_sp' ) )
-
-    for v in helper.get.data( base.modules, true ) do
-        if not v.errorlog then continue end
-
-        if v.errorlog.bLibOutdated then
-            local s1_data, s2_data, ss_data     = '', '', ''
-            s1_data                             = sf( '%-20s', v.name )
-            s2_data                             = sf( '%-20s', rlib.get:versionstr( v ) )
-            s3_data                             = sf( '%-20s', rlib.get:versionstr( ) )
-            s4_data                             = sf( '%-20s', rlib.get:ver2str( v.libreq ) )
-
-            rlib:console( pl, Color( 255, 255, 0 ), s1_data, Color( 255, 255, 255 ), s2_data, Color( 255, 0, 0 ), s3_data, Color( 255, 255, 255 ), s4_data )
-        end
-    end
-
-end

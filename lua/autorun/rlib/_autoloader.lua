@@ -51,8 +51,8 @@ function rlib.autoload:Run( parent )
     mf.repo                     = 'https://github.com/im-richard/rlib/'
     mf.docs                     = 'https://docs.rlib.io/'
     mf.about                    = [[rlib is a glua library written for garrys mod which contains a variety of commonly used functions that are required for certain scripts to run properly. Package includes both rlib + rcore which act as the overall foundation which other scripts will rest within as a series of modules. ]]
-    mf.released                 = 1585258452
-    mf.version                  = { 3, 0, 2 }
+    mf.released                 = 1585389626
+    mf.version                  = { 3, 1, 0 }
     mf.showcopyright            = true
 
     /*
@@ -97,6 +97,7 @@ function rlib.autoload:Run( parent )
         {
             'glon',
             'spew',
+            'orion',
         },
     }
 
@@ -222,7 +223,7 @@ function rlib.autoload:Run( parent )
         *   base :: struct
         */
 
-        local ind_base = { 'a', 'c', 'd', 'i', 'k', 'l', 'm', 'o', 'p', 'r', 's', 't', 'u', 'v', 'w', 'calls', 'checksum', 'cc', 'cvar', '_def', 'fonts', 'modules', 'msg', 'sys', 'register', 'resources', 'pkgs', 'alias', 'get', 'oort', 'udm' }
+        local ind_base = { 'a', 'c', 'd', 'i', 'k', 'l', 'm', 'o', 'p', 'r', 's', 't', 'u', 'v', 'w', 'calls', 'checksum', 'cc', 'con', 'cvar', '_def', 'fonts', 'modules', 'msg', 'sys', 'register', 'resources', 'pkgs', 'alias', 'get', 'oort', 'udm' }
         for k, v in ipairs( ind_base ) do
             base[ v ] = { }
         end
@@ -333,6 +334,7 @@ loaded and are now ready to install additional modules.
 
     local modules_lua =
     {
+        'rclass',
         'sha1',
         'json',
         'rbit',

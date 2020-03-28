@@ -38,7 +38,6 @@ local access            = base.a
 local tools             = base.t
 local konsole           = base.k
 local sys               = base.sys
-local timex             = timex
 
 /*
 *   Localized lua funcs
@@ -52,14 +51,6 @@ local pairs             = pairs
 local ipairs            = ipairs
 local error             = error
 local print             = print
-local setmetatable      = setmetatable
-local Vector            = Vector
-local Angle             = Angle
-local Entity            = Entity
-local EffectData        = EffectData
-local GetConVar         = GetConVar
-local tonumber          = tonumber
-local tostring          = tostring
 local IsValid           = IsValid
 local istable           = istable
 local isfunction        = isfunction
@@ -67,14 +58,10 @@ local isentity          = isentity
 local isnumber          = isnumber
 local isstring          = isstring
 local type              = type
-local file              = file
 local debug             = debug
-local util              = util
 local table             = table
 local os                = os
-local coroutine         = coroutine
 local player            = player
-local math              = math
 local string            = string
 local sf                = string.format
 
@@ -104,12 +91,12 @@ end
 
 local function cid( id, suffix )
     local affix     = istable( suffix ) and suffix.id or isstring( suffix ) and suffix or prefix
-    affix           = affix:sub( -1 ) ~= '.' and string.format( '%s.', affix ) or affix
+    affix           = affix:sub( -1 ) ~= '.' and sf( '%s.', affix ) or affix
 
     id              = isstring( id ) and id or 'noname'
     id              = id:gsub( '[%c%s]', '.' )
 
-    return string.format( '%s%s', affix, id )
+    return sf( '%s%s', affix, id )
 end
 
 /*
@@ -122,13 +109,20 @@ local function pid( str, suffix )
 end
 
 /*
+*   simplifiy funcs
+*/
+
+local function log( ... ) base:log( ... ) end
+local function route( ... ) base.msg:route( ... ) end
+
+/*
 *   checks if server initialized
 *
 *   @return : bool
 */
 
 function base:bInitialized( )
-    return self.sys.initialized and true or false
+    return sys.initialized and true or false
 end
 
 /*
@@ -146,7 +140,7 @@ end
 
 function base:addalias( src, alias, desc )
     if ( not isfunction( src ) and not IsValid( src ) ) or not isstring( alias ) then
-        base:log( 2, 'alias cannot be registered\n%s', debug.traceback( ) )
+        log( 2, 'alias cannot be registered\n%s', debug.traceback( ) )
         return
     end
 
@@ -166,7 +160,7 @@ end
 
 function base:getalias( alias )
     if not alias or not istable( base.alias ) or not base.alias[ alias ] then
-        base:log( 2, 'alias does not exist\n%s', debug.traceback( ) )
+        log( 2, 'alias does not exist\n%s', debug.traceback( ) )
         return
     end
 
@@ -341,7 +335,7 @@ function base:log( cat, msg, ... )
 
     local resp, msg = pcall( sf, msg, unpack( args ) )
 
-    if SERVER and msg and ( cat ~= RLIB_LOG_INFO and cat ~= RLIB_LOG_OK and cat ~= RLIB_LOG_RNET ) then
+    if SERVER and msg and ( cat ~= RLIB_LOG_INFO and cat ~= RLIB_LOG_OK and cat ~= RLIB_LOG_RNET ) and konsole and isfunction( konsole.log ) then
         konsole:log( 'dir_logs', cat, msg )
     end
 
@@ -352,7 +346,7 @@ function base:log( cat, msg, ... )
 
     logs_struct( cat, msg )
 
-    if cat ~= RLIB_LOG_RNET then
+    if cat ~= RLIB_LOG_RNET and konsole and isfunction( konsole.add ) then
         konsole:add( nil, cat, msg, ... )
     end
 end
@@ -396,13 +390,13 @@ end
 *   @return : bool
 */
 
-function base:isconsole( pl )
+function base.con:Is( pl )
     if not pl then return false end
     return isentity( pl ) and pl:EntIndex( ) == 0 and true or false
 end
 
 /*
-*   base :: console allow :: throw except
+*   base :: console :: allow :: throw
 *
 *   checks to see if an action was done by console instead of a player
 *   returns error
@@ -416,8 +410,8 @@ end
 *   @return : bool
 */
 
-function base:isconsole_catch_Allow( pl )
-    if not self:isconsole( pl ) then
+function base.con:ThrowAllow( pl )
+    if not self:Is( pl ) then
         base.msg:target( pl, mf.name, 'Must execute specified action as', cfg.cmsg.clrs.target_tri, 'console only' )
         return true
     end
@@ -425,7 +419,7 @@ function base:isconsole_catch_Allow( pl )
 end
 
 /*
-*   base :: console deny :: throw except
+*   base :: console :: allow :: block
 *
 *   checks to see if an action was done by console instead of a player
 *   returns error
@@ -439,9 +433,9 @@ end
 *   @return : bool
 */
 
-function base:isconsole_catch_Block( pl )
-    if self:isconsole( pl ) then
-        base.msg:route( pl, mf.name, 'Cannot execute specified action as', cfg.cmsg.clrs.target_tri, 'console' )
+function base.con:ThrowBlock( pl )
+    if self:Is( pl ) then
+        route( pl, mf.name, 'Cannot execute specified action as', cfg.cmsg.clrs.target_tri, 'console' )
         return true
     end
     return false
@@ -461,14 +455,14 @@ function base:console( pl, ... )
     local args      = { ... }
     local cache     = unpack( { ... } )
 
-    if args[ 1 ] == 0 then
+    if args[ 1 ] == 0 or args[ 1 ] == 'b' then
         MsgC( Color( 255, 255, 255 ), '\n' )
         return
     end
 
     table.insert( args, '\n' )
 
-    if not cache or cache == ' ' then
+    if not cache or cache == ' ' or cache == 's' or cache == 1 then
         local msg = lang( 'sym_sp' )
         if cache == ' ' then
             msg = sf( ' %s', lang( 'sym_sp' ) )
@@ -477,7 +471,7 @@ function base:console( pl, ... )
         table.insert( args, '\n' )
     end
 
-    if CLIENT or not pl or base:isconsole( pl ) or pl == 'console' then
+    if CLIENT or not pl or base.con:Is( pl ) or ( pl == 'console' or pl == 'c' ) then
         MsgC( Color( 255, 255, 255 ), ' ', unpack( args ) )
     else
         pl:konsole( ... )
@@ -485,7 +479,7 @@ function base:console( pl, ... )
 end
 
 /*
-*   base :: guided console
+*   base :: console :: guided
 *
 *   displays a message in the players console
 *   used in conjunction with base.rsay
@@ -496,7 +490,7 @@ end
 *   @param  : str msg
 */
 
-function base:gconsole( pl, msg )
+function base.con:Guided( pl, msg )
     if CLIENT or ( pl and not pl:IsValid( ) ) then
         Msg( msg .. '\n' )
         return
@@ -635,4 +629,4 @@ local function xcr_run( )
     hook.Run( pid( 'run.xcr' ) )
     hook.Run( pid( 'convars.xcr' ) )
 end
-hook.Add( 'Initialize', pid( '__gm.run.xcr' ), xcr_run )
+hook.Add( 'Initialize', pid( '__lib.run.xcr' ), xcr_run )

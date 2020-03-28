@@ -41,9 +41,9 @@ local helper            = base.h
 local manifest =
 {
     author      = 'richard',
-    desc        = 'timer management and functionality',
-    build       = 122319.1,
-    version     = '2.0.0',
+    desc        = 'timers',
+    build       = 032620,
+    version     = { 2, 0, 0 },
 }
 
 /*
@@ -718,7 +718,7 @@ function utils.cc_timex( ply, cmd, args )
 
     local ccmd = base.calls:get( 'commands', 'timex' )
 
-    if ( ccmd.scope == 1 and not base:isconsole( ply ) ) then
+    if ( ccmd.scope == 1 and not base.con:Is( ply ) ) then
         access:deny_consoleonly( ply, script, ccmd.id )
         return
     end
@@ -753,7 +753,7 @@ function utils.cc_timex_list( ply, cmd, args )
 
     local ccmd = base.calls:get( 'commands', 'timex_list' )
 
-    if ( ccmd.scope == 1 and not base:isconsole( ply ) ) then
+    if ( ccmd.scope == 1 and not base.con:Is( ply ) ) then
         access:deny_consoleonly( ply, script, ccmd.id )
         return
     end

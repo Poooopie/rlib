@@ -40,6 +40,12 @@ local sys               = base.sys
 local resources         = base.resources
 
 /*
+*   localized glua
+*/
+
+local sf                = string.format
+
+/*
 *   Localized cmd func
 *
 *   @source : lua\autorun\libs\calls
@@ -64,13 +70,13 @@ end
 */
 
 local function cid( id, suffix )
-    local affix = istable( suffix ) and suffix.id or isstring( suffix ) and suffix or prefix
-    affix = affix:sub( -1 ) ~= '.' and string.format( '%s.', affix ) or affix
+    local affix     = istable( suffix ) and suffix.id or isstring( suffix ) and suffix or prefix
+    affix           = affix:sub( -1 ) ~= '.' and sf( '%s.', affix ) or affix
 
     id = isstring( id ) and id or 'noname'
     id = id:gsub( '[%c%s]', '.' )
 
-    return string.format( '%s%s', affix, id )
+    return sf( '%s%s', affix, id )
 end
 
 /*
@@ -179,6 +185,97 @@ function base.modules:bExists( mod )
     end
 
     return false
+end
+
+/*
+*   module :: version
+*
+*   returns the version of the installed module as a table
+*
+*   @call   : rlib.modules:ver( mod )
+*           : rlib.modules:ver( 'lunera' )
+*
+*   @since  : v3.0.0
+*   @return : tbl
+*           : major, minor, patch
+*/
+
+function base.modules:ver( mod )
+    if not mod then
+        return {
+            [ 'major' ] = 1,
+            [ 'minor' ] = 0,
+            [ 'patch' ] = 0
+        }
+    end
+    if isstring( mod ) and self.modules[ mod ] and self.modules[ mod ].version then
+        if isstring( self.modules[ mod ].version ) then
+            local ver = string.Explode( '.', self.modules[ mod ].version )
+            return {
+                [ 'major' ] = ver[ 'major' ] or ver[ 1 ] or 1,
+                [ 'minor' ] = ver[ 'minor' ] or ver[ 2 ] or 0,
+                [ 'patch' ] = ver[ 'patch' ] or ver[ 3 ] or 0
+            }
+        elseif istable( self.modules[ mod ].version ) then
+            return {
+                [ 'major' ] = self.modules[ mod ].version.major or self.modules[ mod ].version[ 1 ] or 1,
+                [ 'minor' ] = self.modules[ mod ].version.minor or self.modules[ mod ].version[ 2 ] or 0,
+                [ 'patch' ] = self.modules[ mod ].version.patch or self.modules[ mod ].version[ 3 ] or 0
+            }
+        end
+    elseif istable( mod ) and mod.version then
+        if isstring( mod.version ) then
+            local ver = string.Explode( '.', mod.version )
+            return {
+                [ 'major' ] = ver[ 'major' ] or ver[ 1 ] or 1,
+                [ 'minor' ] = ver[ 'minor' ] or ver[ 2 ] or 0,
+                [ 'patch' ] = ver[ 'patch' ] or ver[ 3 ] or 0
+            }
+        elseif istable( mod.version ) then
+            return {
+                [ 'major' ] = mod.version.major or mod.version[ 1 ] or 1,
+                [ 'minor' ] = mod.version.minor or mod.version[ 2 ] or 0,
+                [ 'patch' ] = mod.version.patch or mod.version[ 3 ] or 0
+            }
+        end
+    end
+    return {
+        [ 'major' ] = 1,
+        [ 'minor' ] = 0,
+        [ 'patch' ] = 0
+    }
+end
+
+/*
+*   module :: version to str
+*
+*   returns the version of the installed module in a human readable string
+*
+*   @call   : rlib.modules:ver2str( mod )
+*           : rlib.modules:ver2str( 'lunera' )
+*
+*   @since  : v1.1.5
+*   @return : str
+*/
+
+function base.modules:ver2str( mod )
+    if not mod then return '1.0.0' end
+    if isstring( mod ) and self.modules[ mod ] and self.modules[ mod ].version then
+        if isstring( self.modules[ mod ].version ) then
+            return self.modules[ mod ].version
+        elseif istable( self.modules[ mod ].version ) then
+            local major, minor, patch = self.modules[ mod ].version.major or self.modules[ mod ].version[ 1 ] or 1, self.modules[ mod ].version.minor or self.modules[ mod ].version[ 2 ] or 0, self.modules[ mod ].version.patch or self.modules[ mod ].version[ 3 ] or 0
+            return sf( '%i.%i.%i', major, minor, patch )
+        end
+    elseif istable( mod ) and mod.version then
+        if isstring( mod.version ) then
+            return mod.version
+        elseif istable( mod.version ) then
+            local major, minor, patch = mod.version.major or mod.version[ 1 ] or 1, mod.version.minor or mod.version[ 2 ] or 0, mod.version.patch or mod.version[ 3 ] or 0
+            return sf( '%i.%i.%i', major, minor, patch )
+        end
+    end
+    return '1.0.0'
 end
 
 /*

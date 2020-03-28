@@ -46,16 +46,7 @@ local resources         = base.resources
 *   bit of performance, we need to.
 */
 
-local Color             = Color
 local pairs             = pairs
-local ipairs            = ipairs
-local error             = error
-local print             = print
-local setmetatable      = setmetatable
-local Vector            = Vector
-local Angle             = Angle
-local Entity            = Entity
-local EffectData        = EffectData
 local GetConVar         = GetConVar
 local tonumber          = tonumber
 local tostring          = tostring
@@ -66,28 +57,11 @@ local isentity          = isentity
 local isnumber          = isnumber
 local isstring          = isstring
 local type              = type
-local file              = file
 local debug             = debug
 local util              = util
 local table             = table
-local os                = os
-local coroutine         = coroutine
-local player            = player
-local math              = math
 local string            = string
 local sf                = string.format
-
-/*
-*   Localized cmd func
-*
-*   @source : lua\autorun\libs\calls
-*   @param  : str t
-*   @param  : varg { ... }
-*/
-
-local function call( t, ... )
-    return rlib:call( t, ... )
-end
 
 /*
 *   Localized translation func
@@ -130,15 +104,15 @@ end
 *   @return : tbl
 */
 
-function base.get:ws( src )
-    return istable( src ) and src or base.w
-end
+    function base.get:ws( src )
+        return istable( src ) and src or base.w
+    end
 
 /*
 *   get :: version
 *
 *   returns the current running version of a specified manifest
-*   supports rlib, module manifest version, and module manifest libreq vesioning
+*   no args = rlib version
 *
 *   @since  : v1.1.5
 *   @param  : tbl, str mnfst
@@ -147,34 +121,34 @@ end
 *           : major, minor, patch
 */
 
-function base.get:version( mnfst, bLibReq )
-    mnfst = ( isstring( mnfst ) or istable( mnfst ) and mnfst ) or mf
+    function base.get:version( mnfst, bLibReq )
+        mnfst = ( isstring( mnfst ) or istable( mnfst ) and mnfst ) or mf
 
-    local src = ( ( not bLibReq and ( istable( mnfst.version ) or isstring( mnfst.version ) ) ) and mnfst.version ) or ( ( bLibReq and ( istable( mnfst.libreq ) or isstring( mnfst.libreq ) ) ) and mnfst.libreq )
+        local src = ( ( not bLibReq and ( istable( mnfst.version ) or isstring( mnfst.version ) ) ) and mnfst.version ) or ( ( bLibReq and ( istable( mnfst.libreq ) or isstring( mnfst.libreq ) ) ) and mnfst.libreq )
 
-    if isstring( src ) then
-        local ver = string.Explode( '.', src )
+        if isstring( src ) then
+            local ver = string.Explode( '.', src )
+            return {
+                [ 'major' ] = ver[ 'major' ] or ver[ 1 ] or 1,
+                [ 'minor' ] = ver[ 'minor' ] or ver[ 2 ] or 0,
+                [ 'patch' ] = ver[ 'patch' ] or ver[ 3 ] or 0
+            }
+        elseif istable( src ) then
+            return {
+                [ 'major' ] = src.major or src[ 1 ] or 1,
+                [ 'minor' ] = src.minor or src[ 2 ] or 0,
+                [ 'patch' ] = src.patch or src[ 3 ] or 0
+            }
+        end
         return {
-            [ 'major' ] = ver[ 'major' ] or ver[ 1 ] or 1,
-            [ 'minor' ] = ver[ 'minor' ] or ver[ 2 ] or 0,
-            [ 'patch' ] = ver[ 'patch' ] or ver[ 3 ] or 0
-        }
-    elseif istable( src ) then
-        return {
-            [ 'major' ] = src.major or src[ 1 ] or 1,
-            [ 'minor' ] = src.minor or src[ 2 ] or 0,
-            [ 'patch' ] = src.patch or src[ 3 ] or 0
+            [ 'major' ] = 1,
+            [ 'minor' ] = 0,
+            [ 'patch' ] = 0
         }
     end
-    return {
-        [ 'major' ] = 1,
-        [ 'minor' ] = 0,
-        [ 'patch' ] = 0
-    }
-end
 
 /*
-*   get :: version str
+*   get :: version 2 string :: manifest
 *
 *   returns the current running version of a specified manifest in human readable format
 *
@@ -182,18 +156,18 @@ end
 *   @return : str
 */
 
-function base.get:versionstr( mnfst )
-    mnfst = ( isstring( mnfst ) or istable( mnfst ) and mnfst ) or mf
+    function base.get:ver2str_mf( mnfst )
+        mnfst = ( isstring( mnfst ) or istable( mnfst ) and mnfst ) or mf
 
-    if isstring( mnfst.version ) then
-        return mnfst.version
-    elseif istable( mnfst.version ) then
-        local major, minor, patch = mnfst.version.major or mnfst.version[ 1 ] or 1, mnfst.version.minor or mnfst.version[ 2 ] or 0, mnfst.version.patch or mnfst.version[ 3 ] or 0
-        return sf( '%i.%i.%i', major, minor, patch )
+        if isstring( mnfst.version ) then
+            return mnfst.version
+        elseif istable( mnfst.version ) then
+            local major, minor, patch = mnfst.version.major or mnfst.version[ 1 ] or 1, mnfst.version.minor or mnfst.version[ 2 ] or 0, mnfst.version.patch or mnfst.version[ 3 ] or 0
+            return sf( '%i.%i.%i', major, minor, patch )
+        end
+
+        return '1.0.0'
     end
-
-    return '1.0.0'
-end
 
 /*
 *   get :: version 2 string
@@ -208,17 +182,54 @@ end
 *   @return : str
 */
 
-function base.get:ver2str( src )
+    function base.get:ver2str( src )
+        if isstring( src ) then
+            return src
+        elseif istable( src ) then
+            local major, minor, patch = src.major or src[ 1 ] or 1, src.minor or src[ 2 ] or 0, src.patch or src[ 3 ] or 0
+            return sf( '%i.%i.%i', major, minor, patch )
+        end
 
-    if isstring( src ) then
-        return src
-    elseif istable( src ) then
-        local major, minor, patch = src.major or src[ 1 ] or 1, src.minor or src[ 2 ] or 0, src.patch or src[ 3 ] or 0
-        return sf( '%i.%i.%i', major, minor, patch )
+        return '1.0.0'
     end
 
-    return '1.0.0'
-end
+/*
+*   base :: get :: structured
+*
+*   returns version tbl as table with major, minor, patch keys
+*
+*   @ex     : rlib.get:ver_struct( { 1, 4, 5 } )
+*
+*   @since  : v3.0.0
+*   @param  : tbl ver
+*   @return : tbl
+*/
+
+    function base.get:ver_struct( ver )
+        return {
+            [ 'major' ] = ( ver and ver[ 'major' ] or ver[ 1 ] ) or 1,
+            [ 'minor' ] = ( ver and ver[ 'minor' ] or ver[ 2 ] ) or 0,
+            [ 'patch' ] = ( ver and ver[ 'patch' ] or ver[ 3 ] ) or 0
+        }
+    end
+
+/*
+*   helper :: get :: ver :: package
+*
+*   returns version tbl as string for rlib packages such as rhook,
+*   timex, calc, etc.
+*
+*   @ex     : rlib.get.ver_pkg( { 1, 4, 5 } )
+*   @ret    : 1.4.5
+*
+*   @param  : tbl ver
+*   @return : str
+*/
+
+    function base.get:ver_pkg( src )
+        if not src then return '1.0.0' end
+        return ( src and src.__manifest and self:ver2str( src.__manifest.version ) ) or { 1, 0, 0 }
+    end
 
 /*
 *   get :: os
@@ -228,15 +239,15 @@ end
 *   @return : str, int
 */
 
-function base.get:os( )
-    if system.IsWindows( ) then
-        return lang( 'sys_os_windows' ), 1
-    elseif system.IsLinux( ) then
-        return lang( 'sys_os_linux' ), 2
-    else
-        return lang( 'sys_os_ukn' ), 0
+    function base.get:os( )
+        if system.IsWindows( ) then
+            return lang( 'sys_os_windows' ), 1
+        elseif system.IsLinux( ) then
+            return lang( 'sys_os_linux' ), 2
+        else
+            return lang( 'sys_os_ukn' ), 0
+        end
     end
-end
 
 /*
 *   get :: host
@@ -246,9 +257,9 @@ end
 *   @return : str
 */
 
-function base.get:host( )
-    return GetHostName( ) or lang( 'sys_host_untitled' )
-end
+    function base.get:host( )
+        return GetHostName( ) or lang( 'sys_host_untitled' )
+    end
 
 /*
 *   get :: address
@@ -258,9 +269,9 @@ end
 *   @return : str
 */
 
-function base.get:addr( )
-    return helper.str:split_addr( game.GetIPAddress( ) )
-end
+    function base.get:addr( )
+        return helper.str:split_addr( game.GetIPAddress( ) )
+    end
 
 /*
 *   get :: gamemode
@@ -272,20 +283,20 @@ end
 *   @return : str, str
 */
 
-function base.get:gm( bCombine, bLowercase )
-    local gm_name = ( GM or GAMEMODE ).Name or lang( 'sys_gm_unknown' )
-    local gm_base = ( GM or GAMEMODE ).BaseClass.Name or lang( 'sys_gm_sandbox' )
+    function base.get:gm( bCombine, bLowercase )
+        local gm_name = ( GM or GAMEMODE ).Name or lang( 'sys_gm_unknown' )
+        local gm_base = ( GM or GAMEMODE ).BaseClass.Name or lang( 'sys_gm_sandbox' )
 
-    -- some darkrp derived gamemodes are marked as sandbox / base
-    gm_base = ( istable( DarkRP ) and lang( 'sys_gm_darkrp' ) ) or gm_base
+        -- some darkrp derived gamemodes are marked as sandbox / base
+        gm_base = ( istable( DarkRP ) and lang( 'sys_gm_darkrp' ) ) or gm_base
 
-    if bCombine then
-        gm_name = sf( '%s [ %s ]', gm_name, gm_base )
-        return gm_name
+        if bCombine then
+            gm_name = sf( '%s [ %s ]', gm_name, gm_base )
+            return gm_name
+        end
+
+        return bLowercase and gm_name:lower( ) or gm_name, bLowercase and gm_base:lower( ) or gm_base
     end
-
-    return bLowercase and gm_name:lower( ) or gm_name, bLowercase and gm_base:lower( ) or gm_base
-end
 
 /*
 *   get :: hash
@@ -295,15 +306,15 @@ end
 *   @return : str
 */
 
-function base.get:hash( )
-    local ip, port = self:getaddr( )
-    if not ip then return end
-    port = port or '27015'
+    function base.get:hash( )
+        local ip, port = self:getaddr( )
+        if not ip then return end
+        port = port or '27015'
 
-    local checksum = util.CRC( ip .. port )
+        local checksum = util.CRC( ip .. port )
 
-    return sf( '%x', checksum )
-end
+        return sf( '%x', checksum )
+    end
 
 /*
 *   get :: server ip
@@ -313,22 +324,22 @@ end
 *   @return : str
 */
 
-function base.get:ip( )
-    local hostip    = GetConVar( 'hostip' ):GetString( )
-    hostip          = tonumber( hostip )
-    if isnumber( hostip ) then
-        local ip    = { }
-        ip[ 1 ]     = bit.rshift( bit.band( hostip, 0xFF000000 ), 24 )
-        ip[ 2 ]     = bit.rshift( bit.band( hostip, 0x00FF0000 ), 16 )
-        ip[ 3 ]     = bit.rshift( bit.band( hostip, 0x0000FF00 ), 8 )
-        ip[ 4 ]     = bit.band( hostip, 0x000000FF )
-        return table.concat( ip, '.' )
-    else
-        hostip      = game.GetIPAddress( )
-        local e     = string.Explode( ':', hostip )
-        return e[ 1 ]
+    function base.get:ip( )
+        local hostip    = GetConVar( 'hostip' ):GetString( )
+        hostip          = tonumber( hostip )
+        if isnumber( hostip ) then
+            local ip    = { }
+            ip[ 1 ]     = bit.rshift( bit.band( hostip, 0xFF000000 ), 24 )
+            ip[ 2 ]     = bit.rshift( bit.band( hostip, 0x00FF0000 ), 16 )
+            ip[ 3 ]     = bit.rshift( bit.band( hostip, 0x0000FF00 ), 8 )
+            ip[ 4 ]     = bit.band( hostip, 0x000000FF )
+            return table.concat( ip, '.' )
+        else
+            hostip      = game.GetIPAddress( )
+            local e     = string.Explode( ':', hostip )
+            return e[ 1 ]
+        end
     end
-end
 
 /*
 *   get :: server port
@@ -338,18 +349,18 @@ end
 *   @return : str
 */
 
-function base.get:port( )
-    local hostport = GetConVar( 'hostport' ):GetInt( )
-    if hostport and hostport ~= 0 then
-        return hostport
-    else
-        local ip    = game.GetIPAddress( )
-        local e     = string.Explode( ':', ip )
-        hostport    = e[ 2 ]
+    function base.get:port( )
+        local hostport = GetConVar( 'hostport' ):GetInt( )
+        if hostport and hostport ~= 0 then
+            return hostport
+        else
+            local ip    = game.GetIPAddress( )
+            local e     = string.Explode( ':', ip )
+            hostport    = e[ 2 ]
 
-        return hostport
+            return hostport
+        end
     end
-end
 
 /*
 *   get :: prefix
@@ -376,15 +387,15 @@ end
 *   @return : str
 */
 
-function base.get:pref( id, suffix )
-    local affix     = istable( suffix ) and suffix.id or isstring( suffix ) and suffix or prefix
-    affix           = affix:sub( -1 ) ~= '.' and sf( '%s.', affix ) or affix
+    function base.get:pref( id, suffix )
+        local affix     = istable( suffix ) and suffix.id or isstring( suffix ) and suffix or prefix
+        affix           = affix:sub( -1 ) ~= '.' and sf( '%s.', affix ) or affix
 
-    id              = isstring( id ) and id or 'noname'
-    id              = id:gsub( '[%p%c%s]', '.' )
+        id              = isstring( id ) and id or 'noname'
+        id              = id:gsub( '[%p%c%s]', '.' )
 
-    return sf( '%s%s', affix, id )
-end
+        return sf( '%s%s', affix, id )
+    end
 
 /*
 *   base :: parent owners
@@ -396,28 +407,28 @@ end
 *   @param  : tbl source
 */
 
-function base.get:owners( source )
-    source = source or base.plugins or { }
+    function base.get:owners( source )
+        source = source or base.plugins or { }
 
-    if not istable( source ) then
-        base:log( 2, 'missing table for » [ %s ]', debug.getinfo( 1, 'n' ).name )
-        return false
-    end
+        if not istable( source ) then
+            base:log( 2, 'missing table for » [ %s ]', debug.getinfo( 1, 'n' ).name )
+            return false
+        end
 
-    for v in helper.get.data( source ) do
-        if not v.manifest.owner then continue end
-        if type( v.manifest.owner ) == 'string' then
-            if helper.ok.sid64( v.manifest.owner ) and not table.HasValue( base.o, v.manifest.owner ) then
-                table.insert( base.o, v.manifest.owner )
-            end
-        elseif type( v.manifest.owner ) == 'table' then
-            for t, ply in pairs( v.manifest.owner ) do
-                if helper.ok.sid64( ply ) and not table.HasValue( base.o, ply ) then
-                    table.insert( base.o, ply )
+        for v in helper.get.data( source ) do
+            if not v.manifest.owner then continue end
+            if type( v.manifest.owner ) == 'string' then
+                if helper.ok.sid64( v.manifest.owner ) and not table.HasValue( base.o, v.manifest.owner ) then
+                    table.insert( base.o, v.manifest.owner )
+                end
+            elseif type( v.manifest.owner ) == 'table' then
+                for t, ply in pairs( v.manifest.owner ) do
+                    if helper.ok.sid64( ply ) and not table.HasValue( base.o, ply ) then
+                        table.insert( base.o, ply )
+                    end
                 end
             end
         end
-    end
 
-    return base.o
-end
+        return base.o
+    end

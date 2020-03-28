@@ -74,7 +74,7 @@ function tools.dc:Run( )
     :title              ( lang( 'dc_title' )                    )
     :actshow            (                                       )
 end
-base.cc.Add( pid( 'dc' ), tools.dc.Run )
+rcc.new.gmod( pid( 'dc' ), tools.dc.Run )
 
 /*
 *	konsole :: run
@@ -89,7 +89,7 @@ function tools.konsole:Run( )
     end
     konsole.pnl:ActionShow( )
 end
-base.cc.Add( pid( 'konsole' ), tools.konsole.Run )
+rcc.new.gmod( pid( 'konsole' ), tools.konsole.Run )
 
 /*
 *	tools :: languages :: run
@@ -107,7 +107,7 @@ function tools.language:Run( )
     :title                  ( lang( 'lang_sel_title' )          )
     :actshow                (                                   )
 end
-base.cc.Add( pid( 'lang' ), tools.language.Run )
+rcc.new.gmod( pid( 'lang' ), tools.language.Run )
 
 /*
 *	tools :: mviewer :: run
@@ -126,7 +126,7 @@ function tools.mviewer:Run( )
     :title                  ( lang( 'mviewer_title' )           )
     :actshow                (                                   )
 end
-base.cc.Add( pid( 'mview' ), tools.mviewer.Run )
+rcc.new.gmod( pid( 'mview' ), tools.mviewer.Run )
 
 /*
 *   tools :: pco :: run
@@ -142,7 +142,7 @@ function tools.pco:Run( bEnable )
 
     for k, v in pairs( helper._pco_cvars ) do
         local val = v.val or ( bEnable and 1 ) or 0
-        base.cc.Run( v.id, val )
+        rcc.run.gmod( v.id, val )
     end
 end
 
@@ -164,7 +164,7 @@ function tools.rcfg:Run( )
     :title                  ( lang( 'lib_addons_title' )        )
     :actshow                (                                   )
 end
-base.cc.Add( pid( 'rcfg' ), tools.rcfg.Run )
+rcc.new.gmod( pid( 'rcfg' ), tools.rcfg.Run )
 
 /*
 *	tools :: rmain :: run
@@ -195,7 +195,7 @@ function tools.rmain:Run( )
     :title                  ( lang( 'title_about' )             )
     :actshow                (                                   )
 end
-base.cc.Add( pid( 'about' ), tools.rmain.Run )
+rcc.new.gmod( pid( 'about' ), tools.rmain.Run )
 
 /*
 *	tools :: report :: run
@@ -215,7 +215,7 @@ function tools.report:Run( )
     :title                  ( lang( 'reports_title' )           )
     :actshow                (                                   )
 end
-base.cc.Add( pid( 'report' ), tools.report.Run )
+rcc.new.gmod( pid( 'report' ), tools.report.Run )
 
 /*
 *   netlib :: konsole

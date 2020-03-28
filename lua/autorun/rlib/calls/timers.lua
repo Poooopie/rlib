@@ -28,10 +28,11 @@ local base                  = rlib
 
 base.c.timers =
 {
-    [ '__lib_noroot_notice' ]                   = { '__lib.noroot.notice' },
-    [ '__gm_initialize' ]                       = { '__gm.initialize' },
-    [ '__gm_initialize_setup' ]                 = { '__gm.initialize.setup' },
-    [ '__gm_initialize_udm' ]                   = { '__gm.initialize.udm' },
+    [ '__lib_initialize' ]                      = { '__lib.initialize' },
+    [ '__lib_initialize_setup' ]                = { '__lib.initialize.setup' },
+    [ '__lib_initialize_udm' ]                  = { '__lib.initialize.udm' },
+    [ '__lib_onready_delay' ]                   = { '__lib.onready.delay' },
+    [ 'rlib_noroot_notice' ]                    = { 'rlib.noroot.notice' },
     [ 'rlib_about_run' ]                        = { 'rlib.about.run' },
     [ 'rlib_udm_notice' ]                       = { 'rlib.udm.notice' },
     [ 'rlib_udm_check' ]                        = { 'rlib.udm.check' },

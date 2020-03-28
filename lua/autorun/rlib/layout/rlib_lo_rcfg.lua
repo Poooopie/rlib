@@ -287,7 +287,7 @@ function PANEL:Init( )
         */
 
         local m_name                = isstring( v.name ) and v.name or v.id
-        local m_ver                 = sf( '%s', rlib.get:versionstr( v ) )
+        local m_ver                 = sf( '%s', rlib.get:ver2str_mf( v ) )
         local m_rel                 = v.released and os.date( '%m.%d.%y', v.released )
         local m_def                 = 'http://cdn.rlib.io/gms/env.png'
         local m_img                 = ( isstring( v.icon ) and v.icon ~= '' and v.icon ) or m_def

@@ -55,6 +55,7 @@ base.c.commands =
         desc        = 'primary command which displays top-level help',
         args        = '[ <command> ], [ <-flag> <search_keyword> ]',
         scope       = 2,
+        showsetup   = true,
         ex =
         {
             'rlib',
@@ -75,8 +76,8 @@ base.c.commands =
         {
             'This command is the base command to all sub-levels'
         },
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_base( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_base( pl, cmd, args, str )
         end,
     },
     [ 'rlib_access' ] =
@@ -87,8 +88,8 @@ base.c.commands =
         desc        = 'returns your current access to rlib',
         pubc        = '!access',
         scope       = 2,
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_access( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_access( pl, cmd, args, str )
         end,
     },
     [ 'rlib_admins' ] =
@@ -98,8 +99,9 @@ base.c.commands =
         name        = 'Admins',
         desc        = 'returns list of steamids with access to lib',
         scope       = 2,
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_admins( ply, cmd, args, str )
+        showsetup   = true,
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_admins( pl, cmd, args, str )
         end,
     },
     [ 'rlib_calls' ] =
@@ -121,8 +123,8 @@ base.c.commands =
             [ 'search' ]    = { flag = '-s', desc = 'search results' },
             [ 'raw' ]       = { flag = '-r', desc = 'raw simple output' },
         },
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_calls( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_calls( pl, cmd, args, str )
         end,
     },
     [ 'rlib_debug' ] =
@@ -132,8 +134,9 @@ base.c.commands =
         name        = 'Debug',
         desc        = 'toggles debug mode on and off',
         scope       = 2,
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_debug( ply, cmd, args, str )
+        showsetup   = true,
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_debug( pl, cmd, args, str )
         end,
     },
     [ 'rlib_debug_status' ] =
@@ -143,8 +146,8 @@ base.c.commands =
         name        = 'Debug » Status',
         desc        = 'returns state / status of debug mode',
         scope       = 2,
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_debug_status( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_debug_status( pl, cmd, args, str )
         end,
     },
     [ 'rlib_debug_clean' ] =
@@ -163,8 +166,8 @@ base.c.commands =
         {
             [ 'cancel' ]    = { flag = '-c', desc = 'cancel cleaning action' },
         },
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_debug_cleanlogs( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_debug_cleanlogs( pl, cmd, args, str )
         end,
     },
     [ 'rlib_debug_diag' ] =
@@ -174,12 +177,13 @@ base.c.commands =
         name        = 'Debug » Diagnostic',
         desc        = 'checks a variety of areas to prep from dev -> production',
         scope       = 1,
+        showsetup   = true,
         ex =
         {
             'rlib.debug.diag',
         },
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_debug_diag( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_debug_diag( pl, cmd, args, str )
         end,
     },
     [ 'rlib_debug_devop' ] =
@@ -189,8 +193,8 @@ base.c.commands =
         name        = 'Debug » DevOP',
         desc        = 'returns devop hook (testing purposes only)',
         scope       = 2,
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_debug_devop( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_debug_devop( pl, cmd, args, str )
         end,
     },
     [ 'rlib_checksum_new' ] =
@@ -204,8 +208,8 @@ base.c.commands =
         {
             'rlib.checksum.new',
         },
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_checksum_new( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_checksum_new( pl, cmd, args, str )
         end,
     },
     [ 'rlib_checksum_verify' ] =
@@ -226,8 +230,8 @@ base.c.commands =
             [ 'all' ]       = { flag = '-a', desc = 'displays all results' },
             [ 'filter' ]    = { flag = '-f', desc = 'filter search results' },
         },
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_checksum_verify( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_checksum_verify( pl, cmd, args, str )
         end,
     },
     [ 'rlib_help' ] =
@@ -237,8 +241,9 @@ base.c.commands =
         name        = 'Help',
         desc        = 'returns help info for lib',
         scope       = 2,
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_help( ply, cmd, args, str )
+        showsetup   = true,
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_help( pl, cmd, args, str )
         end,
     },
     [ 'rlib_oort' ] =
@@ -248,8 +253,8 @@ base.c.commands =
         name        = 'Oort Engine » Status',
         desc        = 'returns state / status of oort engine',
         scope       = 1,
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_oort( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_oort( pl, cmd, args, str )
         end,
     },
     [ 'rlib_languages' ] =
@@ -259,8 +264,8 @@ base.c.commands =
         name        = 'Languages',
         desc        = 'returns translation/language info',
         scope       = 2,
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_languages( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_languages( pl, cmd, args, str )
         end,
     },
     [ 'rlib_license' ] =
@@ -270,8 +275,8 @@ base.c.commands =
         name        = 'License',
         desc        = 'returns license information for lib',
         scope       = 2,
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_license( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_license( pl, cmd, args, str )
         end,
     },
     [ 'rlib_manifest' ] =
@@ -281,8 +286,8 @@ base.c.commands =
         name        = 'Manifest',
         desc        = 'returns lib manifest',
         scope       = 2,
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_manifest( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_manifest( pl, cmd, args, str )
         end,
     },
     [ 'rlib_mats' ] =
@@ -292,17 +297,18 @@ base.c.commands =
         name        = 'Material List',
         desc        = 'returns registered materials',
         scope       = 3,
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_materials_list( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_materials_list( pl, cmd, args, str )
         end,
     },
     [ 'rlib_modules' ] =
     {
         enabled     = true,
         id          = 'rlib.modules',
-        name        = ':: reroute :: rcore modules',
-        desc        = 'reroutes to rcore.modules',
+        name        = 'rcore modules',
+        desc        = 'displays all registred rcore modules',
         scope       = 1,
+        showsetup   = true,
         ex =
         {
             'rlib.modules',
@@ -312,8 +318,24 @@ base.c.commands =
         {
             [ 'paths' ]         = { flag = '-p', desc = 'display module install paths' },
         },
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_modules_reroute( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_modules( pl, cmd, args, str )
+        end,
+    },
+    [ 'rlib_modules_errlog' ] =
+    {
+        enabled     = true,
+        id          = 'rlib.modules.errlog',
+        name        = 'errlogs',
+        desc        = 'displays errors for each module',
+        scope       = 1,
+        showsetup   = true,
+        ex =
+        {
+            'rlib.modules.errlog',
+        },
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_modules_errlog( pl, cmd, args, str )
         end,
     },
     [ 'rlib_packages' ] =
@@ -323,8 +345,8 @@ base.c.commands =
         name        = 'Packages',
         desc        = 'returns list of running packages',
         scope       = 1,
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_packages( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_packages( pl, cmd, args, str )
         end,
     },
     [ 'rlib_panels' ] =
@@ -344,8 +366,8 @@ base.c.commands =
         {
             [ 'search' ] = { flag = '-s', desc = 'search results' },
         },
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_rpanels( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_rpanels( pl, cmd, args, str )
         end,
     },
     [ 'rlib_services' ] =
@@ -365,8 +387,8 @@ base.c.commands =
         {
             [ 'search' ] = { flag = '-s', desc = 'search results' },
         },
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_services( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_services( pl, cmd, args, str )
         end,
     },
     [ 'rlib_asay' ] =
@@ -379,12 +401,13 @@ base.c.commands =
         desc        = 'Send messages using the asay tool',
         args        = '[ <msg> ]',
         scope       = 1,
+        showsetup   = true,
         ex =
         {
             'rlib.asay hello',
         },
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_tools_asay( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_tools_asay( pl, cmd, args, str )
         end,
     },
     [ 'rlib_tools_rdo' ] =
@@ -396,14 +419,15 @@ base.c.commands =
         desc        = '(render distance optimization), return or set state / status of rdo',
         args        = '[ <state> ]',
         scope       = 1,
+        showsetup   = true,
         ex =
         {
             'rlib.tools.rdo',
             'rlib.tools.rdo enable',
             'rlib.tools.rdo disable',
         },
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_tools_rdo( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_tools_rdo( pl, cmd, args, str )
         end,
     },
     [ 'rlib_tools_pco' ] =
@@ -416,14 +440,15 @@ base.c.commands =
         desc        = '(player client optimization), return or set state / status of pco',
         args        = '[ <state> ]',
         scope       = 1,
+        showsetup   = true,
         ex =
         {
             'rlib.tools.pco',
             'rlib.tools.pco enable',
             'rlib.tools.pco disable',
         },
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_tools_pco( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_tools_pco( pl, cmd, args, str )
         end,
     },
     [ 'rlib_restart' ] =
@@ -442,8 +467,8 @@ base.c.commands =
             'rlib.restart',
             'rlib.restart -c',
         },
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_restart( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_restart( pl, cmd, args, str )
         end,
     },
     [ 'rlib_trestart' ] =
@@ -468,8 +493,21 @@ base.c.commands =
             'Can be cancelled with the command [ rlib.trestart -c ]',
             'Default: 30 seconds'
         },
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_timed_restart( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_timed_restart( pl, cmd, args, str )
+        end,
+    },
+    [ 'rlib_session' ] =
+    {
+        enabled     = true,
+        warn        = true,
+        id          = 'rlib.session',
+        name        = 'Session',
+        desc        = 'returns your current session id',
+        scope       = 2,
+        showsetup   = true,
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_session( pl, cmd, args, str )
         end,
     },
     [ 'rlib_setup' ] =
@@ -480,8 +518,8 @@ base.c.commands =
         desc        = 'configures certain parameters of rlib; should be ran when first installed',
         pubc        = '!setup',
         scope       = 1,
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_setup( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_setup( pl, cmd, args, str )
         end,
     },
     [ 'rlib_status' ] =
@@ -491,8 +529,9 @@ base.c.commands =
         name        = 'Status',
         desc        = 'returns stats and data for the lib',
         scope       = 1,
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_status( ply, cmd, args, str )
+        showsetup   = true,
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_status( pl, cmd, args, str )
         end,
     },
     [ 'rlib_reload' ] =
@@ -503,8 +542,20 @@ base.c.commands =
         name        = 'Reload',
         desc        = 'reloads rlib to server',
         scope       = 1,
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_reload( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_reload( pl, cmd, args, str )
+        end,
+    },
+    [ 'rlib_rehash' ] =
+    {
+        enabled     = true,
+        warn        = true,
+        id          = 'rlib.rehash',
+        name        = 'Rehash',
+        desc        = 'reloads rlib or any other service on server',
+        scope       = 1,
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_rehash( pl, cmd, args, str )
         end,
     },
     [ 'rlib_udm' ] =
@@ -521,8 +572,8 @@ base.c.commands =
             'rlib.udm on',
             'rlib.udm off',
         },
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_udm( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_udm( pl, cmd, args, str )
         end,
     },
     [ 'rlib_uptime' ] =
@@ -533,8 +584,9 @@ base.c.commands =
         desc        = 'returns uptime of the server',
         pubc        = '!uptime',
         scope       = 2,
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_uptime( ply, cmd, args, str )
+        showsetup   = true,
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_uptime( pl, cmd, args, str )
         end,
     },
     [ 'rlib_user' ] =
@@ -559,8 +611,8 @@ base.c.commands =
             [ 'remove' ]    = { flag = '-r', desc = 'removes a player from rlib access' },
             [ 'status' ]    = { flag = '-s', desc = 'checks a players access to rlib' },
         },
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_user( ply, cmd, args, str )
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_user( pl, cmd, args, str )
         end,
     },
     [ 'rlib_version' ] =
@@ -571,8 +623,9 @@ base.c.commands =
         desc        = 'current running build of lib',
         pubc        = '!version',
         scope       = 2,
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_version( ply, cmd, args, str )
+        showsetup   = true,
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_version( pl, cmd, args, str )
         end,
     },
     [ 'rlib_workshops' ] =
@@ -582,8 +635,9 @@ base.c.commands =
         name        = 'Workshops',
         desc        = 'returns workshop ids loaded between modules / lib',
         scope       = 2,
-        assoc = function( ply, cmd, args, str )
-            rlib.u.cc_workshops( ply, cmd, args, str )
+        showsetup   = true,
+        assoc = function( pl, cmd, args, str )
+            rlib.u.cc_workshops( pl, cmd, args, str )
         end,
     },
 }

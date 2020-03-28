@@ -461,7 +461,7 @@ function access:initialize( perms )
     end
 
 end
-hook.Add( pid( 'initialize.post' ), pid( 'initialize.perms' ), access.initialize )
+hook.Add( pid( 'initialize.post' ), pid( 'initialize_perms' ), access.initialize )
 
 /*
 *   konsole :: send
@@ -524,7 +524,7 @@ function utils.cc_materials_list( pl, cmd, args )
 
     local ccmd = base.calls:get( 'commands', 'rlib_mats' )
 
-    if ( ccmd.scope == 1 and not base:isconsole( pl ) ) then
+    if ( ccmd.scope == 1 and not base.con:Is( pl ) ) then
         access:deny_consoleonly( pl, script, ccmd.id )
         return
     end
@@ -558,7 +558,7 @@ function utils.cc_rpanels( pl, cmd, args )
 
     local ccmd = base.calls:get( 'commands', 'rlib_panels' )
 
-    if ( ccmd.scope == 1 and not base:isconsole( pl ) ) then
+    if ( ccmd.scope == 1 and not base.con:Is( pl ) ) then
         access:deny_consoleonly( pl, script, ccmd.id )
         return
     end
@@ -747,7 +747,7 @@ net.Receive( 'rlib.debug.listener', netlib_debug_listener )
 */
 
 local function initialize( )
-    timex.simple( pid( '__gm_initialize' ), 1, function( )
+    timex.simple( '__lib_initialize', 1, function( )
         for l, m in SortedPairs( base.w ) do
             steamworks.FileInfo( l, function( res )
                 if not res or not res.title then return end
@@ -759,7 +759,7 @@ local function initialize( )
 
     hook.Run( pid( 'initialize' ) )
 end
-hook.Add( 'Initialize', pid( '__gm.initialize' ), initialize )
+hook.Add( 'Initialize', pid( '__lib_initialize' ), initialize )
 
 /*
 *   rlib :: initialize :: post
@@ -775,14 +775,14 @@ hook.Add( 'Initialize', pid( '__gm.initialize' ), initialize )
 *   commonly used for actions such as registering permissions, concommands, etc.
 */
 
-local function initialize_post( )
+local function __lib_initpostentity( )
     hook.Run( pid( 'cmd.register' ) )
     hook.Run( pid( 'pkg.register' ) )
     hook.Run( pid( 'fnt.register' ) )
 
     for k, v in pairs( _G.rcalls.commands ) do
         if ( v.scope == 2 or v.scope == 3 ) and v.enabled then
-            base.cc.Add( v.id, v.assoc )
+            rcc.new.gmod( v.id, v.assoc )
         else
             continue
         end
@@ -790,7 +790,7 @@ local function initialize_post( )
 
     hook.Run( pid( 'initialize.post' ) )
 end
-hook.Add( 'InitPostEntity', pid( '__gm.initpostentity' ), initialize_post )
+hook.Add( 'InitPostEntity', pid( '__lib_initpostentity' ), __lib_initpostentity )
 
 /*
 *	rlib :: think :: resolution

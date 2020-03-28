@@ -38,14 +38,14 @@ local konsole           = base.k
 *   pkg declarations
 */
 
-    local manifest =
-    {
-        author          = 'richard',
-        desc            = 'send / receive data between client & server',
-        build           = 090419.1,
-        version         = '2.1.0',
-        debug_id        = 'rnet.debug.delay',
-    }
+local manifest =
+{
+    author          = 'richard',
+    desc            = 'network library',
+    build           = 032620,
+    version         = { 2, 0, 0 },
+    debug_id        = 'rnet.debug.delay',
+}
 
 /*
 *   module declarations
@@ -304,14 +304,6 @@ send                = { }
 */
 
 cfg.debug           = cfg.debug or false
-
-/*
-*   module info :: manifest
-*/
-
-function pkg:manifest( )
-    return self.__manifest
-end
 
 /*
 *   returns directory table
@@ -1000,7 +992,7 @@ function utils.cc_rnet_debug( ply, cmd, args )
 
     local ccmd = base.calls:get( 'commands', 'rnet_debug' )
 
-    if ( ccmd.scope == 1 and not base:isconsole( ply ) ) then
+    if ( ccmd.scope == 1 and not base.con:Is( ply ) ) then
         access:deny_consoleonly( ply, script, ccmd.id )
         return
     end
@@ -1073,7 +1065,7 @@ function utils.cc_rnet_refresh( ply, cmd, args )
 
     local ccmd = base.calls:get( 'commands', 'rnet_refresh' )
 
-    if ( ccmd.scope == 1 and not base:isconsole( ply ) ) then
+    if ( ccmd.scope == 1 and not base.con:Is( ply ) ) then
         access:deny_consoleonly( ply, script, ccmd.id )
         return
     end
@@ -1127,7 +1119,7 @@ function utils.cc_rnet_index( ply, cmd, args )
 
     local ccmd = base.calls:get( 'commands', 'rnet_index' )
 
-    if ( ccmd.scope == 1 and not base:isconsole( ply ) ) then
+    if ( ccmd.scope == 1 and not base.con:Is( ply ) ) then
         access:deny_consoleonly( ply, script, ccmd.id )
         return
     end
@@ -1163,7 +1155,7 @@ function utils.cc_rnet_router( ply, cmd, args )
 
     local ccmd = base.calls:get( 'commands', 'rnet_router' )
 
-    if ( ccmd.scope == 1 and not base:isconsole( ply ) ) then
+    if ( ccmd.scope == 1 and not base.con:Is( ply ) ) then
         access:deny_consoleonly( ply, script, ccmd.id )
         return
     end
@@ -1202,7 +1194,7 @@ function utils.cc_rnet( ply, cmd, args )
 
     local ccmd = base.calls:get( 'commands', 'rnet' )
 
-    if ( ccmd.scope == 1 and not base:isconsole( ply ) ) then
+    if ( ccmd.scope == 1 and not base.con:Is( ply ) ) then
         access:deny_consoleonly( ply, script, ccmd.id )
         return
     end
@@ -1340,6 +1332,14 @@ local function register_pkg( )
     base.pkgs:register( _M )
 end
 hook.Add( pid( 'pkg.register' ), pid( '__rnet.pkg.register' ), register_pkg )
+
+/*
+*   module info :: manifest
+*/
+
+function pkg:manifest( )
+    return self.__manifest
+end
 
 /*
 *   __tostring

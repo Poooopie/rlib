@@ -41,9 +41,9 @@ local helper            = base.h
 local manifest =
 {
     author      = 'richard',
-    desc        = 'mathmatics and various calculations',
-    build       = 071019.1,
-    version     = '2.0.0',
+    desc        = 'calculations',
+    build       = 032620,
+    version     = { 2, 0, 0 },
 }
 
 /*
@@ -77,14 +77,6 @@ settings            = settings or { }
 sys                 = sys or { }
 pos                 = pos or { }
 fs                  = fs or { }
-
-/*
-*   module info :: manifest
-*/
-
-function pkg:manifest( )
-    return self.__manifest
-end
 
 /*
 *   return number of human players on server
@@ -181,11 +173,11 @@ end
 */
 
 function fs.size( bytes )
-    local rpos = 2
-    local kb = 1024
-    local mb = kb * 1024
-    local gb = mb * 1024
-    local tb = gb * 1024
+    local rpos  = 2
+    local kb    = 1024
+    local mb    = kb * 1024
+    local gb    = mb * 1024
+    local tb    = gb * 1024
 
     if ( ( bytes >= 0 ) and ( bytes < kb ) ) then
         return bytes .. ' Bytes'
@@ -380,9 +372,9 @@ function xp_percent_float( ply, multiplier )
 
     local pl_level      = ( isfunction( ply.getlevel ) and ply:getlevel( ) ) or 0
     local pl_xp         = ( isfunction( ply.getxp ) and math.floor( ply:getxp( ) ) ) or 0
-    local xp_percent    = ( ( pl_xp or 0 ) / ( ( ( 10 + ( ( ( pl_level or 1 ) * ( ( pl_level or 1 ) + 1 ) * 90 ) ) ) ) * ( ( isnumber( multiplier ) and multiplier ) or LevelSystemConfiguration.XPMult or 1.0 ) ) ) or 0
+    local pl_calc       = ( ( pl_xp or 0 ) / ( ( ( 10 + ( ( ( pl_level or 1 ) * ( ( pl_level or 1 ) + 1 ) * 90 ) ) ) ) * ( ( isnumber( multiplier ) and multiplier ) or LevelSystemConfiguration.XPMult or 1.0 ) ) ) or 0
 
-    return xp_percent
+    return pl_calc
 end
 
 /*
@@ -562,7 +554,7 @@ function utils.cc_calc( ply, cmd, args )
 
     local ccmd = base.calls:get( 'commands', 'calc' )
 
-    if ( ccmd.scope == 1 and not base:isconsole( ply ) ) then
+    if ( ccmd.scope == 1 and not base.con:Is( ply ) ) then
         access:deny_consoleonly( ply, script, ccmd.id )
         return
     end
@@ -618,6 +610,14 @@ local function register_pkg( )
     base.pkgs:register( _M )
 end
 hook.Add( prefix .. 'pkg.register', prefix .. '__calc.pkg.register', register_pkg )
+
+/*
+*   module info :: manifest
+*/
+
+function pkg:manifest( )
+    return self.__manifest
+end
 
 /*
 *   __tostring

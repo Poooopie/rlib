@@ -344,7 +344,7 @@ hook.Add( pid( 'calls.post' ), pid( 'calls.load.post' ), calls_load_post )
 *   call using localized function in file that you require fetching needed calls.
 *
 *   @ex     : rlib.calls:get( 'calltype', 'id' )
-*             rlib.calls:get( 'commands', 'rcore_modules' )
+*             rlib.calls:get( 'commands', 'rlib_modules' )
 *
 *   @param  : str t
 *   @param  : str s

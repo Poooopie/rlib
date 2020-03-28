@@ -91,38 +91,21 @@ end
     }
 
 /*
-*   debug :: toggle
-*
-*   enabled [ true ] allows for special debug returns to print in console which helps with diagnosing 
-*   issues with the server
-*
-*   you may use the alternative method provided which utilizing a concommand to activate debug mode for
-*   approx. 20 minutes. automatically turns itself off after the timer has expired.
-* 
-*   if disabled [ false ], logging system will still print message types related to errors, warnings, 
-*   successes, and various others, however, anything labeled as a 'debug' message type will be silenced.
-*
-*   :   enabled
-*       determines if debug mode enabled
-*
-*   :   stats
-*       prints server and loadtime statistics when everything has finished loading.
-*
-*   :   clean_threshold
-*       number of files that must reside in the debug folder before a message is displayed in console to 
-*       clean the folder.
-*
-*   @assoc      : libs/rlib_core_sh.lua
-*               : base:log( )
+*   general
 */
 
-    cfg.debug =
+    cfg.general = { }
+
+/*
+*   hooks
+*/
+
+    cfg.hooks =
     {
-        enabled             = false,
-        stats               = true,
-        time_default        = 300,
-        clean_threshold     = 100,
-        clean_delaytime     = 30,
+        timers =
+        {
+            [ '__lib_onready_delay' ] = 1,
+        }
     }
 
 /*
@@ -212,7 +195,7 @@ end
         {
             desc = 'view the registered list of calls',
             func = function( )
-                base.cc.Run( prefix .. 'calls' )
+                rcc.run.gmod( prefix .. 'calls' )
                 konsole:send( 8, 'View console for calls list' )
             end
         },
@@ -269,7 +252,7 @@ end
         {
             desc = 'how long the server has been online',
             func = function( )
-                base.cc.Run( prefix .. 'uptime' )
+                rcc.run.gmod( prefix .. 'uptime' )
                 local uptime = timex.secs.sh_cols( SysTime( ) - rlib.sys.uptime )
                 konsole:send( 0, Color( 255, 255, 255 ), sf( '%s ', lang( 'server_uptime' ) ), Color( 200, 50, 50 ), uptime )
             end
@@ -278,8 +261,8 @@ end
         {
             desc = 'get the current version of ' .. prefix,
             func = function( )
-                base.cc.Run( prefix .. 'version' )
-                konsole:send( 0, Color( 255, 255, 255 ), 'running ', Color( 31, 133, 222 ), 'v' .. base.get:versionstr( ), Color( 200, 200, 200 ), ' [ ', Color( 194, 111, 111 ), os.date( '%m.%d.%Y', mf.released ), Color( 200, 200, 200 ), ' ] ' )
+                rcc.run.gmod( prefix .. 'version' )
+                konsole:send( 0, Color( 255, 255, 255 ), 'running ', Color( 31, 133, 222 ), 'v' .. base.get:ver2str_mf( ), Color( 200, 200, 200 ), ' [ ', Color( 194, 111, 111 ), os.date( '%m.%d.%Y', mf.released ), Color( 200, 200, 200 ), ' ] ' )
             end
         },
     }
@@ -652,4 +635,39 @@ end
             t5      = Color( 255, 107, 250 ),    -- pink
             t6      = Color( 25, 200, 25 ),      -- green
         }
+    }
+
+/*
+*   debug :: toggle
+*
+*   enabled [ true ] allows for special debug returns to print in console which helps with diagnosing 
+*   issues with the server
+*
+*   you may use the alternative method provided which utilizing a concommand to activate debug mode for
+*   approx. 20 minutes. automatically turns itself off after the timer has expired.
+* 
+*   if disabled [ false ], logging system will still print message types related to errors, warnings, 
+*   successes, and various others, however, anything labeled as a 'debug' message type will be silenced.
+*
+*   :   enabled
+*       determines if debug mode enabled
+*
+*   :   stats
+*       prints server and loadtime statistics when everything has finished loading.
+*
+*   :   clean_threshold
+*       number of files that must reside in the debug folder before a message is displayed in console to 
+*       clean the folder.
+*
+*   @assoc      : libs/rlib_core_sh.lua
+*               : base:log( )
+*/
+
+    cfg.debug =
+    {
+        enabled             = false,
+        stats               = true,
+        time_default        = 300,
+        clean_threshold     = 1000,
+        clean_delaytime     = 30,
     }

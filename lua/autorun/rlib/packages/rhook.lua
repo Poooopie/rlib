@@ -28,14 +28,14 @@ local prefix            = mf.prefix
 *   pkg declarations
 */
 
-    local manifest =
-    {
-        author          = 'richard',
-        desc            = 'hook management',
-        build           = 121919.1,
-        version         = '1.0.0',
-        debug_id        = 'rhook.debug.delay',
-    }
+local manifest =
+{
+    author          = 'richard',
+    desc            = 'hook management',
+    build           = 032620,
+    version         = { 2, 0, 0 },
+    debug_id        = 'rhook.debug.delay',
+}
 
 /*
 *   module declarations
@@ -50,6 +50,9 @@ local dcat          = 9
 local math          = math
 local module        = module
 local sf            = string.format
+local isstring      = isstring
+local istable       = istable
+local isfunction    = isfunction
 
 /*
 *   Localized translation func
@@ -76,12 +79,12 @@ end
 
 local function pref( id, suffix )
     local affix     = istable( suffix ) and suffix.id or isstring( suffix ) and suffix or prefix
-    affix           = affix:sub( -1 ) ~= '.' and string.format( '%s.', affix ) or affix
+    affix           = affix:sub( -1 ) ~= '.' and sf( '%s.', affix ) or affix
 
     id = isstring( id ) and id or 'noname'
     id = id:gsub( '[%c%s]', '.' )
 
-    return string.format( '%s%s', affix, id )
+    return sf( '%s%s', affix, id )
 end
 
 /*

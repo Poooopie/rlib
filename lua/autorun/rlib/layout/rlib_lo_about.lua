@@ -258,7 +258,7 @@ function PANEL:Init( )
 
                                 :draw( function( s, w, h )
                                     draw.SimpleText( lang( 'label_version' ), pref( 'about.entry.label' ), w / 2, h / 2 - 10, Color( 200, 100, 100, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
-                                    draw.SimpleText( base.get:versionstr( ), pref( 'about.entry.value' ), w / 2, h / 2 + 10, Color( 237, 237, 237, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+                                    draw.SimpleText( base.get:ver2str_mf( ), pref( 'about.entry.value' ), w / 2, h / 2 + 10, Color( 237, 237, 237, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
                                 end )
 
     /*

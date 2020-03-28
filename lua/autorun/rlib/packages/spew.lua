@@ -52,6 +52,29 @@ local pkg               = spew
 local pkg_name          = 'spew'
 
 /*
+*	prefix :: create id
+*/
+
+local function pref( id, suffix )
+    local affix = istable( suffix ) and suffix.id or isstring( suffix ) and suffix or prefix
+    affix = affix:sub( -1 ) ~= '.' and string.format( '%s.', affix ) or affix
+
+    id = isstring( id ) and id or 'noname'
+    id = id:gsub( '[%c%s]', '.' )
+
+    return string.format( '%s%s', affix, id )
+end
+
+/*
+*	prefix :: handle
+*/
+
+local function pid( str, suffix )
+    local state = ( isstring( suffix ) and suffix ) or ( base and mf.prefix ) or false
+    return pref( str, state )
+end
+
+/*
 *   pkg declarations
 */
 
@@ -59,8 +82,8 @@ local manifest =
 {
     author      = 'richard',
     desc        = 'console spew',
-    build       = 030619.2,
-    version     = '1.1.0',
+    build       = 032620,
+    version     = { 2, 0, 0 },
 }
 
 /*
@@ -98,14 +121,6 @@ spew.destroyinit = true
 */
 
 spew.loaded = false
-
-/*
-*   module info :: manifest
-*/
-
-function pkg:manifest( )
-    return self.__manifest
-end
 
 /*
 *   spew :: initialized :: destroy hook
@@ -187,7 +202,7 @@ function utils.cc_spew( ply, cmd, args )
 
     local ccmd = base.calls:get( 'commands', 'spew' )
 
-    if ( ccmd.scope == 1 and not base:isconsole( ply ) ) then
+    if ( ccmd.scope == 1 and not base.con:Is( ply ) ) then
         access:deny_consoleonly( ply, script, ccmd.id )
         return
     end
@@ -220,7 +235,7 @@ function utils.cc_spew_enabled( ply, cmd, args )
 
     local ccmd = base.calls:get( 'commands', 'spew_enabled' )
 
-    if ( ccmd.scope == 1 and not base:isconsole( ply ) ) then
+    if ( ccmd.scope == 1 and not base.con:Is( ply ) ) then
         access:deny_consoleonly( ply, script, ccmd.id )
         return
     end
@@ -337,7 +352,17 @@ local function register_commands( )
 
     base.calls:register_cmds( pkg_commands )
 end
-hook.Add( prefix .. 'cmd.register', prefix .. '__spew.cmd.register', register_commands )
+hook.Add( pid( 'cmd.register' ), pid( '__spew.cmd.register' ), register_commands )
+
+
+
+/*
+*   module info :: manifest
+*/
+
+function pkg:manifest( )
+    return self.__manifest
+end
 
 /*
 *   __index / manifest declarations

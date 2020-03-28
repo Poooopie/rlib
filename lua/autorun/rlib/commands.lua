@@ -23,7 +23,7 @@
 rlib                    = rlib or { }
 local base              = rlib
 local mf                = base.manifest
-local prefix            = mf.prefix
+local pf                = mf.prefix
 local script            = mf.name
 local cfg               = base.settings
 
@@ -38,7 +38,6 @@ local access            = base.a
 local tools             = base.t
 local konsole           = base.k
 local sys               = base.sys
-local timex             = timex
 
 /*
 *   Localized lua funcs
@@ -50,17 +49,9 @@ local Color             = Color
 local pairs             = pairs
 local ipairs            = ipairs
 local SortedPairs       = SortedPairs
-local error             = error
-local print             = print
-local setmetatable      = setmetatable
 local Vector            = Vector
-local Angle             = Angle
-local Entity            = Entity
-local EffectData        = EffectData
-local GetConVar         = GetConVar
 local tonumber          = tonumber
 local tostring          = tostring
-local IsValid           = IsValid
 local istable           = istable
 local isfunction        = isfunction
 local isentity          = isentity
@@ -69,18 +60,15 @@ local isstring          = isstring
 local type              = type
 local file              = file
 local debug             = debug
-local util              = util
 local table             = table
 local os                = os
 local coroutine         = coroutine
-local player            = player
 local math              = math
 local string            = string
 local sf                = string.format
-local execq             = RunString
 
 /*
-*   debug path
+*   manifest paths
 */
 
 local path_logs         = mf.paths[ 'dir_logs' ]
@@ -96,14 +84,6 @@ local function oort( ... )
 end
 
 /*
-*   localized http.post
-*/
-
-local function oort_post( ... )
-    return http.Post( ... )
-end
-
-/*
 *   Localized translation func
 */
 
@@ -116,13 +96,13 @@ end
 */
 
 local function pref( id, suffix )
-    local affix = istable( suffix ) and suffix.id or isstring( suffix ) and suffix or prefix
-    affix = affix:sub( -1 ) ~= '.' and string.format( '%s.', affix ) or affix
+    local affix     = istable( suffix ) and suffix.id or isstring( suffix ) and suffix or pf
+    affix           = affix:sub( -1 ) ~= '.' and sf( '%s.', affix ) or affix
 
-    id = isstring( id ) and id or 'noname'
-    id = id:gsub( '[%c%s]', '.' )
+    id              = isstring( id ) and id or 'noname'
+    id              = id:gsub( '[%c%s]', '.' )
 
-    return string.format( '%s%s', affix, id )
+    return sf( '%s%s', affix, id )
 end
 
 /*
@@ -130,9 +110,17 @@ end
 */
 
 local function pid( str, suffix )
-    local state = ( isstring( suffix ) and suffix ) or ( base and mf.prefix ) or false
+    local state = ( isstring( suffix ) and suffix ) or ( base and pf ) or false
     return pref( str, state )
 end
+
+/*
+*   simplifiy funcs
+*/
+
+local function console( ... ) base:console( ... ) end
+local function log( ... ) base:log( ... ) end
+local function route( ... ) base.msg:route( ... ) end
 
 /*
 *   concommand :: user
@@ -158,7 +146,7 @@ function utils.cc_user( pl, cmd, args )
     *   scope
     */
 
-    if ( ccmd.scope == 1 and not base:isconsole( pl ) ) then
+    if ( ccmd.scope == 1 and not base.con:Is( pl ) ) then
         access:deny_consoleonly( pl, script, ccmd.id )
         return
     end
@@ -177,14 +165,14 @@ function utils.cc_user( pl, cmd, args )
     local target = args and args[ 2 ] or false
 
     if not target then
-        base.msg:route( pl, script, 'You must supply at least a valid partial', cfg.cmsg.clrs.target, 'player name' )
+        route( pl, script, 'You must supply at least a valid partial', cfg.cmsg.clrs.target, 'player name' )
         return
     end
 
     local c_results, result = helper.who:name_wc( target )
 
     if c_results > 1 then
-        base.msg:route( pl, script, 'More than one result was found, type more of the name. Place in quotes for names with spaces. Example:', cfg.cmsg.clrs.target, '\"John Doe\"' )
+        route( pl, script, 'More than one result was found, type more of the name. Place in quotes for names with spaces. Example:', cfg.cmsg.clrs.target, '\"John Doe\"' )
         return
     elseif not c_results or c_results < 1 then
         if subarg == 'remove' or subarg == '-r' then
@@ -200,27 +188,27 @@ function utils.cc_user( pl, cmd, args )
             end
 
             if cnt > 1 then
-                base.msg:route( pl, script, 'More than one result was found, type more of the name. Place in quotes for names with spaces. Example:', cfg.cmsg.clrs.target, '\"John Doe\"' )
+                route( pl, script, 'More than one result was found, type more of the name. Place in quotes for names with spaces. Example:', cfg.cmsg.clrs.target, '\"John Doe\"' )
                 return
             elseif cnt == 0 then
-                base.msg:route( pl, script, 'No valid player found' )
+                route( pl, script, 'No valid player found' )
                 return
             elseif cnt == 1 then
                 local bRemoved = access:deluser( user )
 
                 if bRemoved then
-                    base.msg:route( pl, script, 'Successfully removed player', cfg.cmsg.clrs.target, user_name, cfg.cmsg.clrs.msg, 'from rlib access' )
+                    route( pl, script, 'Successfully removed player', cfg.cmsg.clrs.target, user_name, cfg.cmsg.clrs.msg, 'from rlib access' )
                 else
-                    base.msg:route( pl, script, 'No access found for player', cfg.cmsg.clrs.target, user_name )
+                    route( pl, script, 'No access found for player', cfg.cmsg.clrs.target, user_name )
                 end
             end
         else
-            base.msg:route( pl, script, 'No results found! Place in quotes for names with spaces. Example:', cfg.cmsg.clrs.target, '\"John Doe\"' )
+            route( pl, script, 'No results found! Place in quotes for names with spaces. Example:', cfg.cmsg.clrs.target, '\"John Doe\"' )
             return
         end
     else
         if not helper.ok.ply( result[ 0 ] ) then
-            base.msg:route( pl, script, 'No valid player found' )
+            route( pl, script, 'No valid player found' )
             return
         else
             result = result[ 0 ]
@@ -228,31 +216,31 @@ function utils.cc_user( pl, cmd, args )
                 local bExists = access:writeuser( result )
 
                 if bExists then
-                    base.msg:route( pl, script, 'user', cfg.cmsg.clrs.target, result:Name( ), cfg.cmsg.clrs.msg, 'already exists' )
+                    route( pl, script, 'user', cfg.cmsg.clrs.target, result:Name( ), cfg.cmsg.clrs.msg, 'already exists' )
                 else
-                    base.msg:route( pl, script, 'Successfully added player', cfg.cmsg.clrs.target, result:Name( ), cfg.cmsg.clrs.msg, 'to rlib access' )
+                    route( pl, script, 'Successfully added player', cfg.cmsg.clrs.target, result:Name( ), cfg.cmsg.clrs.msg, 'to rlib access' )
                 end
             elseif subarg == 'remove' or subarg == '-r' then
                 local bRemoved = access:deluser( result )
 
                 if bRemoved then
-                    base.msg:route( pl, script, 'Successfully removed player', cfg.cmsg.clrs.target, result:Name( ), cfg.cmsg.clrs.msg, 'from rlib access' )
+                    route( pl, script, 'Successfully removed player', cfg.cmsg.clrs.target, result:Name( ), cfg.cmsg.clrs.msg, 'from rlib access' )
                 else
-                    base.msg:route( pl, script, 'no access found for player', cfg.cmsg.clrs.target, result:Name( ) )
+                    route( pl, script, 'no access found for player', cfg.cmsg.clrs.target, result:Name( ) )
                 end
             elseif subarg == 'status' or subarg == '-s' then
                 local bExists = access:hasuser( result )
                 if not bExists then
-                    base.msg:route( pl, script, cfg.cmsg.clrs.target, result:Name( ), cfg.cmsg.clrs.msg, 'does not have access' )
+                    route( pl, script, cfg.cmsg.clrs.target, result:Name( ), cfg.cmsg.clrs.msg, 'does not have access' )
                 else
-                    base.msg:route( pl, script, cfg.cmsg.clrs.target, result:Name( ), cfg.cmsg.clrs.msg, 'has admin access' )
+                    route( pl, script, cfg.cmsg.clrs.target, result:Name( ), cfg.cmsg.clrs.msg, 'has admin access' )
                 end
             end
 
             -- update admins list for perms
-            net.Start( 'rlib.user' )
-            net.WriteTable( access.admins )
-            net.Broadcast( )
+            net.Start       ( 'rlib.user'   )
+            net.WriteTable  ( access.admins )
+            net.Broadcast   (               )
 
         end
     end
@@ -277,7 +265,7 @@ function utils.cc_debug_cleanlogs( pl, cmd, args, str )
     *   scope
     */
 
-    if ( ccmd.scope == 1 and not base:isconsole( pl ) ) then
+    if ( ccmd.scope == 1 and not base.con:Is( pl ) ) then
         access:deny_consoleonly( pl, script, ccmd.id )
         return
     end
@@ -305,16 +293,16 @@ function utils.cc_debug_cleanlogs( pl, cmd, args, str )
 
     if ( arg_param and ( arg_param == gcf_cancel ) or ( arg_param == '-cancel' or arg_param == 'cancel' ) and timex.exists( 'rlib_debug_doclean' ) ) then
         timex.expire( 'rlib_debug_doclean' )
-        base:log( 4, lang( 'logs_clean_cancel' ) )
+        log( 4, lang( 'logs_clean_cancel' ) )
         return
     end
 
     if arg_param then
-        base:log( 2, lang( 'cmd_param_invalid', timer_clean, prefix ) )
+        log( 2, lang( 'cmd_param_invalid', timer_clean, pf ) )
         return
     end
 
-    base:log( 4, lang( 'logs_clean_scheduled', timer_clean, prefix, '-c' ) )
+    log( 4, lang( 'logs_clean_scheduled', timer_clean, pf, '-c' ) )
 
     timex.create( 'rlib_debug_doclean', timer_clean, 1, function( )
         local files, _ = file.Find( path_logs .. '/*', 'DATA' )
@@ -327,7 +315,7 @@ function utils.cc_debug_cleanlogs( pl, cmd, args, str )
             i_del = i_del + 1
         end
 
-        base:log( 4, lang( 'logs_clean_success', i_del, path_logs ) )
+        log( 4, lang( 'logs_clean_success', i_del, path_logs ) )
     end )
 
 end
@@ -350,7 +338,7 @@ function utils.cc_debug_diag( pl, cmd, args, str )
     *   scope
     */
 
-    if ( ccmd.scope == 1 and not base:isconsole( pl ) ) then
+    if ( ccmd.scope == 1 and not base.con:Is( pl ) ) then
         access:deny_consoleonly( pl, script, ccmd.id )
         return
     end
@@ -368,14 +356,14 @@ function utils.cc_debug_diag( pl, cmd, args, str )
     *   functionality
     */
 
-    base:console( pl, '\n' )
-    base:console( pl, Color( 255, 255, 0 ), ' ' .. script, Color( 255, 0, 255 ), ' » ', Color( 255, 255, 255 ), 'Debug Diag' )
-    base:console( pl, lang( 'sym_sp' ) )
-    base:console( pl, Color( 255, 255, 255 ), ' Information listed below is for the developer to utilize in order to determine what state\n the current build is configured in.' )
-    base:console( pl, lang( 'sym_sp' ) )
+    console( pl, '\n' )
+    console( pl, Color( 255, 255, 0 ), ' ' .. script, Color( 255, 0, 255 ), ' » ', Color( 255, 255, 255 ), 'Debug Diag' )
+    console( pl, lang( 'sym_sp' ) )
+    console( pl, Color( 255, 255, 255 ), ' Information listed below is for the developer to utilize in order to determine what state\n the current build is configured in.' )
+    console( pl, lang( 'sym_sp' ) )
 
     local g0_cat = sf( '\n %s » %s', script, 'General' )
-    base:console( pl, Color( 255, 0, 0 ), g0_cat .. '\n' )
+    console( pl, Color( 255, 0, 0 ), g0_cat .. '\n' )
 
     local get_state =
     {
@@ -398,34 +386,34 @@ function utils.cc_debug_diag( pl, cmd, args, str )
         cs_data     = sf( '%-5s', ' » ' )
         l2_d        = sf( '%-15s', val )
 
-        base:console( pl, Color( 255, 255, 0 ), l1_d, Color( 255, 0, 255 ), cs_data, Color( 255, 255, 255 ), l2_d )
+        console( pl, Color( 255, 255, 0 ), l1_d, Color( 255, 0, 255 ), cs_data, Color( 255, 255, 255 ), l2_d )
     end
 
     local v0_cat = sf( '\n %s » %s', script, 'Versions' )
-    base:console( pl, Color( 255, 0, 0 ), v0_cat .. '\n' )
+    console( pl, Color( 255, 0, 0 ), v0_cat .. '\n' )
 
     local get_versions =
     {
-        { id = lang( 'col_name_lib' ),          val = base.get:versionstr( ) or 'missing' },
-        { id = lang( 'col_name_spew' ),         val = base.spew and base.spew.__manifest and base.spew.__manifest.version or 'missing' },
-        { id = rnet.__manifest.name,            val = rnet and rnet.__manifest and rnet.__manifest.version or 'missing' },
-        { id = timex.__manifest.name,           val = timex and timex.__manifest and timex.__manifest.version or 'missing' },
-        { id = rcc.__manifest.name,             val = rcc and rcc.__manifest and rcc.__manifest.version or 'missing' },
-        { id = rhook.__manifest.name,           val = rhook and rhook.__manifest and rhook.__manifest.version or 'missing' },
+        { id = lang( 'col_name_lib' ),          val = base.get:ver2str_mf( ) or 'missing' },
+        { id = lang( 'col_name_spew' ),         val = base.get:ver_pkg( base.spew ) },
+        { id = rnet.__manifest.name,            val = base.get:ver_pkg( rnet ) },
+        { id = timex.__manifest.name,           val = base.get:ver_pkg( timex ) },
+        { id = rcc.__manifest.name,             val = base.get:ver_pkg( rcc ) },
+        { id = rhook.__manifest.name,           val = base.get:ver_pkg( rhook ) },
     }
 
     for m in helper.get.data( get_versions ) do
         if not m.val then continue end
 
-        local id    = tostring( m.id )
-        local val   = tostring( m.val )
+        local id    = m.id
+        local val   = m.val
 
         local l1_d, l2_d, cs_data = '', '', ''
         l1_d        = sf( '%-20s', ' ' .. id )
         cs_data     = sf( '%-5s', ' » ' )
         l2_d        = sf( '%-15s', val )
 
-        base:console( pl, Color( 255, 255, 0 ), l1_d, Color( 255, 0, 255 ), cs_data, Color( 255, 255, 255 ), l2_d )
+        console( pl, Color( 255, 255, 0 ), l1_d, Color( 255, 0, 255 ), cs_data, Color( 255, 255, 255 ), l2_d )
     end
 
     /*
@@ -433,24 +421,24 @@ function utils.cc_debug_diag( pl, cmd, args, str )
     */
 
     if not istable( rcore ) then
-        base:console( pl, '\n' .. lang( 'sym_sp' ) )
-        base:console( pl, Color( 255, 0, 0 ), ' \n ', Color( 255, 0, 0 ), lang( 'status_rcore_missing' ) )
+        console( pl, '\n' .. lang( 'sym_sp' ) )
+        console( pl, Color( 255, 0, 0 ), ' \n ', Color( 255, 0, 0 ), lang( 'status_rcore_missing' ) )
         return
     end
 
-    base:console( pl, '\n' .. lang( 'sym_sp' ) )
+    console( pl, '\n' .. lang( 'sym_sp' ) )
 
     local c0_cat = sf( '\n %s » %s', 'rcore', 'Demo Mode Active\n' )
 
-    base:console( pl, Color( 255, 0, 0 ), c0_cat )
+    console( pl, Color( 255, 0, 0 ), c0_cat )
 
     local bIsDemo = false
     for v in helper.get.data( rcore.modules ) do
         if not v.demo and not v.demomode then continue end
-        local name      = tostring( helper.str:truncate( v.name, 20, '...' ) or lang( 'err' ) )
-        local ver       = tostring( v.version )
-        local author    = tostring( v.author )
-        local desc      = tostring( helper.str:truncate( v.desc, 40, '...' ) or lang( 'err' ) )
+        local name      = helper.str:truncate( v.name, 20, '...' ) or lang( 'err' )
+        local ver       = base.get:ver2str( v.version )
+        local author    = v.author
+        local desc      = helper.str:truncate( v.desc, 40, '...' ) or lang( 'err' )
 
         local ml1_data, ml2_data, ml3_data, ml4_data, ml0_resp = '', '', '', '', ''
         ml1_data = sf( '%-20s', name )
@@ -461,14 +449,14 @@ function utils.cc_debug_diag( pl, cmd, args, str )
 
         bIsDemo = true
 
-        base:console( pl, Color( 255, 255, 0 ), ml0_resp )
+        console( pl, Color( 255, 255, 0 ), ml0_resp )
     end
 
     if not bIsDemo then
-        base:console( pl, ' No modules' )
+        console( pl, ' No modules' )
     end
 
-    base:console( pl, '\n' .. lang( 'sym_sp' ) )
+    console( pl, '\n' .. lang( 'sym_sp' ) )
 
 end
 
@@ -490,7 +478,7 @@ function utils.cc_checksum_new( pl, cmd, args, str )
     *   scope
     */
 
-    if ( ccmd.scope == 1 and not base:isconsole( pl ) ) then
+    if ( ccmd.scope == 1 and not base.con:Is( pl ) ) then
         access:deny_consoleonly( pl, script, ccmd.id )
         return
     end
@@ -533,7 +521,7 @@ function utils.cc_checksum_verify( pl, cmd, args, str )
     *   scope
     */
 
-    if ( ccmd.scope == 1 and not base:isconsole( pl ) ) then
+    if ( ccmd.scope == 1 and not base.con:Is( pl ) ) then
         access:deny_consoleonly( pl, script, ccmd.id )
         return
     end
@@ -553,7 +541,7 @@ function utils.cc_checksum_verify( pl, cmd, args, str )
 
     local checksums = base.checksum:verify( )
     if not istable( checksums ) then
-        base:console( pl, Color( 255, 255, 255 ), lang( 'checksum_validate_fail' ) )
+        console( pl, Color( 255, 255, 255 ), lang( 'checksum_validate_fail' ) )
         return
     end
 
@@ -577,17 +565,17 @@ function utils.cc_checksum_verify( pl, cmd, args, str )
 
     local cnt = table.Count( checksums )
 
-    base:console( pl, '\n' )
-    base:console( pl, Color( 255, 255, 0 ), script, Color( 255, 0, 255 ), ' » ', Color( 255, 255, 255 ), lang( 'con_checksum_verify' ) )
-    base:console( pl, lang( 'sym_sp' ) )
+    console( pl, '\n' )
+    console( pl, Color( 255, 255, 0 ), script, Color( 255, 0, 255 ), ' » ', Color( 255, 255, 255 ), lang( 'con_checksum_verify' ) )
+    console( pl, lang( 'sym_sp' ) )
 
     /*
     *   output :: check :: files verified
     */
 
     if cnt == 0 then
-        base:console( pl, Color( 255, 255, 255 ), lang( 'files_modified_none' ) )
-        base:console( pl, lang( 'sym_sp' ) )
+        console( pl, Color( 255, 255, 255 ), lang( 'files_modified_none' ) )
+        console( pl, lang( 'sym_sp' ) )
         return
     end
 
@@ -595,8 +583,8 @@ function utils.cc_checksum_verify( pl, cmd, args, str )
     *   output :: subheader
     */
 
-    base:console( pl, Color( 255, 255, 255 ), lang( 'files_listed_have_been_modified' ) )
-    base:console( pl, lang( 'sym_sp' ) .. '\n' )
+    console( pl, Color( 255, 255, 255 ), lang( 'files_listed_have_been_modified' ) )
+    console( pl, lang( 'sym_sp' ) .. '\n' )
 
     /*
     *   columns
@@ -607,8 +595,8 @@ function utils.cc_checksum_verify( pl, cmd, args, str )
     local l3_l      = sf( '%-5s',     lang( 'sym_arrow'       ) )
     local l4_l      = sf( '%-15s',    lang( 'col_current'     ) )
 
-    base:console( pl, Color( 255, 255, 255 ), l1_l, Color( 0, 255, 0 ), l2_l, Color( 255, 255, 255 ), l3_l, Color( 255, 0, 0 ), l4_l )
-    base:console( pl )
+    console( pl, Color( 255, 255, 255 ), l1_l, Color( 0, 255, 0 ), l2_l, Color( 255, 255, 255 ), l3_l, Color( 255, 0, 0 ), l4_l )
+    console( pl )
 
     local i = 0
     for k, v in pairs( checksums ) do
@@ -622,17 +610,17 @@ function utils.cc_checksum_verify( pl, cmd, args, str )
         local l3_d      = sf( '%-5s',   '»'         )
         local l4_d      = sf( '%-15s',  current     )
 
-        base:console( pl, Color( 255, 255, 0 ), l1_d, Color( 0, 255, 0 ), l2_d, Color( 255, 255, 255 ), l3_d, Color( 255, 0, 0 ), l4_d )
+        console( pl, Color( 255, 255, 0 ), l1_d, Color( 0, 255, 0 ), l2_d, Color( 255, 255, 255 ), l3_d, Color( 255, 0, 0 ), l4_d )
 
         i = i + 1
     end
 
     if i > 0 then
-        base:console( pl, lang( 'sym_sp' ) .. '\n' )
-        base:console( pl, Color( 255, 255, 255 ), lang( 'files_modified_count', i ) )
+        console( pl, lang( 'sym_sp' ) .. '\n' )
+        console( pl, Color( 255, 255, 255 ), lang( 'files_modified_count', i ) )
     end
 
-    base:console( pl, '\n' )
+    console( pl, '\n' )
 
 end
 
@@ -655,7 +643,7 @@ function utils.cc_udm( pl, cmd, args )
     *   scope
     */
 
-    if ( ccmd.scope == 1 and not base:isconsole( pl ) ) then
+    if ( ccmd.scope == 1 and not base.con:Is( pl ) ) then
         access:deny_consoleonly( pl, script, ccmd.id )
         return
     end
@@ -678,7 +666,7 @@ function utils.cc_udm( pl, cmd, args )
     local duration  = args and args[ 2 ] or cfg.udm.checktime or 1800
 
     if not base:bInitialized( ) then
-        base:log( 1, lang( 'lib_udm_err_noinit' ) )
+        log( 1, lang( 'lib_udm_err_noinit' ) )
         return
     end
 
@@ -701,30 +689,30 @@ function utils.cc_udm( pl, cmd, args )
             if timex.exists( timer_id ) then
                 local next_chk = timex.remains( timer_id )
                 next_chk = timex.secs.sh_simple( next_chk, false, true )
-                base:log( 4, lang( 'lib_udm_nextchk', next_chk ) )
+                log( 4, lang( 'lib_udm_nextchk', next_chk ) )
                 return
             end
 
             if duration and not helper:bIsNum( duration ) then
-                base:log( 2, lang( 'lib_udm_bad_dur' ) )
+                log( 2, lang( 'lib_udm_bad_dur' ) )
                 return
             end
 
-            base:log( 4, lang( 'lib_udm_started', duration ) )
+            log( 4, lang( 'lib_udm_started', duration ) )
 
             base.udm:Run( duration )
         else
             timex.expire( timer_id )
-            base:log( 4, lang( 'lib_udm_stopped', duration ) )
+            log( 4, lang( 'lib_udm_stopped', duration ) )
         end
     else
         if timex.exists( timer_id ) then
             local next_chk = timex.remains( timer_id )
             next_chk = timex.secs.sh_simple( next_chk, false, true )
-            base:log( 4, lang( 'lib_udm_active', next_chk ) )
+            log( 4, lang( 'lib_udm_active', next_chk ) )
             return
         else
-            base:log( 1, lang( 'lib_udm_inactive' ) )
+            log( 1, lang( 'lib_udm_inactive' ) )
         end
     end
 
@@ -753,7 +741,7 @@ function utils.cc_calls( pl, cmd, args )
     *   scope
     */
 
-    if ( ccmd.scope == 1 and not base:isconsole( pl ) ) then
+    if ( ccmd.scope == 1 and not base.con:Is( pl ) ) then
         access:deny_consoleonly( pl, script, ccmd.id )
         return
     end
@@ -781,7 +769,7 @@ function utils.cc_calls( pl, cmd, args )
         end
     end
 
-    base:console( pl, output )
+    console( pl, output )
 
     /*
     *   loop calls table
@@ -795,9 +783,9 @@ function utils.cc_calls( pl, cmd, args )
             tbl_calls = rlib.c
         else
             if arg_param == '-s' and arg_searchstr then
-                base:console( pl, Color( 255, 0, 0 ), ' ' .. lang( 'search_term', arg_searchstr ) )
+                console( pl, Color( 255, 0, 0 ), ' ' .. lang( 'search_term', arg_searchstr ) )
             elseif arg_param == '-r' then
-                base:console( pl, Color( 255, 0, 0 ), ' ' .. lang( 'search_raw' ) )
+                console( pl, Color( 255, 0, 0 ), ' ' .. lang( 'search_raw' ) )
                 helper.p_table( tbl_calls )
                 return
             end
@@ -814,15 +802,15 @@ function utils.cc_calls( pl, cmd, args )
 
             if not cat_islisted then
                 local l_category = sf( ' %s', a )
-                base:console( pl, '\n' .. lang( 'sym_sp' ) )
+                console( pl, '\n' .. lang( 'sym_sp' ) )
 
                 local l1_l      = sf( '%-15s', l_category )
                 local l2_l      = sf( '%-35s', lang( 'col_id' ) )
                 local l3_l      = sf( '%-35s', lang( 'col_data' ) )
                 local l4_l      = sf( '%s %s %s', l1_l, l2_l, l3_l )
 
-                base:console( pl, Color( 255, 255, 255 ), l4_l )
-                base:console( pl, lang( 'sym_sp' ) )
+                console( pl, Color( 255, 255, 255 ), l4_l )
+                console( pl, lang( 'sym_sp' ) )
 
                 cat_islisted, cat_id = true, a
             end
@@ -850,12 +838,12 @@ function utils.cc_calls( pl, cmd, args )
                     c0_resp = sf( '%s%s %s %s', c0_resp, l1_d, l2_d, l3_d )
 
                     if cnt_fields == i then
-                        i_entries = i_entries + 1
+                        i_entries   = i_entries + 1
                         c0_resp     = c0_resp .. '\n'
                         cnt_fields  = 0
                     end
 
-                    base:console( pl, Color( 255, 255, 0 ), c0_resp )
+                    console( pl, Color( 255, 255, 0 ), c0_resp )
                 end
             elseif isstring( v ) then
                 if not arg_searchstr or arg_searchstr and string.match( v, arg_searchstr ) then
@@ -867,7 +855,7 @@ function utils.cc_calls( pl, cmd, args )
                     c0_resp = sf( '%s%s %s %s', c0_resp, l1_d, l2_d, l3_d )
 
                     i_entries = i_entries + 1
-                    base:console( pl, Color( 255, 255, 0 ), c0_resp )
+                    console( pl, Color( 255, 255, 0 ), c0_resp )
                 end
             end
 
@@ -875,34 +863,33 @@ function utils.cc_calls( pl, cmd, args )
 
     end
 
-    base:console( pl, '\n' .. lang( 'sym_sp' ) )
+    console( pl, '\n' .. lang( 'sym_sp' ) )
     local c_ftr = sf( lang( 'calls_found_cnt', i_entries ) )
-    base:console( pl, Color( 0, 255, 0 ), c_ftr )
-    base:console( pl, lang( 'sym_sp' ) )
+    console( pl, Color( 0, 255, 0 ), c_ftr )
+    console( pl, lang( 'sym_sp' ) )
 
 end
 
 /*
-*   concommand :: modules :: reroute
+*   concommand :: modules :: error logs
 *
-*   in the event that someone types 'rlib.modules', this command will redirect them to the proper 
-*   'rcore.modules'
+*   displays any registered errors with the specified module
 */
 
-function utils.cc_modules_reroute( pl, cmd, args )
+function utils.cc_modules_errlog( pl, cmd, args )
 
     /*
     *   define command
     */
 
-    local ccmd = base.calls:get( 'commands', 'rlib_modules' )
+    local ccmd = rlib.calls:get( 'commands', 'rlib_modules_errlog' )
 
     /*
     *   scope
     */
 
-    if ( ccmd.scope == 1 and not base:isconsole( pl ) ) then
-        access:deny_consoleonly( pl, script, ccmd.id )
+    if ( ccmd.scope == 1 and not rlib.con:Is( pl ) ) then
+        access:deny_consoleonly( pl, base.manifest.name, ccmd.id )
         return
     end
 
@@ -910,18 +897,118 @@ function utils.cc_modules_reroute( pl, cmd, args )
     *   perms
     */
 
-    if not access:bIsRoot( pl ) then return end
+    if not access:bIsRoot( pl ) then
+        access:deny_permission( pl, base.manifest.name, ccmd.id )
+        return
+    end
 
     /*
     *   functionality
     */
 
-    if not istable( rcore ) then
-        base:console( pl, Color( 255, 0, 0 ), ' ', Color( 255, 0, 0 ), lang( 'reroute_rcore_missing' ) )
+    console         ( pl, '\n' )
+    console         ( pl, Color( 255, 255, 0 ), rlib.manifest.name, Color( 255, 0, 255 ), ' » ', Color( 255, 255, 255 ), 'Errorlogs' )
+    console         ( pl, lang( 'sym_sp' ) )
+
+    /*
+    *   outdated libraries
+    */
+
+    console         ( pl, Color( 255, 255, 0 ), '» ', Color( 255, 255, 255 ), 'Outdated\n' )
+    console         ( pl, Color( 255, 255, 255 ), 'The following modules require a more recent version of rlib to function properly' )
+    console         ( pl, lang( 'sym_sp' ) )
+    console         ( pl, 0 )
+
+    local l1_l      = sf( '%-20s', 'Module'         )
+    local l2_l      = sf( '%-20s', 'Module Version' )
+    local l3_l      = sf( '%-20s', 'Lib Version'    )
+    local l4_l      = sf( '%-20s', 'Lib Required'   )
+
+    console         ( pl, Color( 255, 255, 0 ), l1_l, Color( 255, 255, 255 ), l2_l, Color( 255, 0, 0 ), l3_l, Color( 255, 255, 255 ), l4_l )
+    console         ( pl, lang( 'sym_sp' ) )
+
+    for v in helper.get.data( rcore.modules, true ) do
+        if not v.errorlog then continue end
+
+        if v.errorlog.bLibOutdated then
+            local l1_d, l2_d, l3_d, l4_d
+            l1_d        = sf( '%-20s', v.name )
+            l2_d        = sf( '%-20s', rlib.get:ver2str_mf( v ) )
+            l3_d        = sf( '%-20s', rlib.get:ver2str_mf( ) )
+            l4_d        = sf( '%-20s', rlib.get:ver2str( v.libreq ) )
+
+            console( pl, Color( 255, 255, 0 ), l1_d, Color( 255, 255, 255 ), l2_d, Color( 255, 0, 0 ), l3_d, Color( 255, 255, 255 ), l4_d )
+        end
+    end
+
+end
+
+/*
+*   concommand :: modules :: reroute
+*
+*   lists all installed modules
+*/
+
+function utils.cc_modules( pl, cmd, args )
+
+    /*
+    *   define command
+    */
+
+    local ccmd = rlib.calls:get( 'commands', 'rlib_modules' )
+
+    /*
+    *   scope
+    */
+
+    if ( ccmd.scope == 1 and not rlib.con:Is( pl ) ) then
+        access:deny_consoleonly( pl, base.manifest.name, ccmd.id )
         return
     end
 
-    rcore.cc_modules( pl, cmd, args, str )
+    /*
+    *   perms
+    */
+
+    if not access:bIsRoot( pl ) then
+        access:deny_permission( pl, base.manifest.name, ccmd.id )
+        return
+    end
+
+    /*
+    *   declarations
+    */
+
+    local arg_param     = args and args[ 1 ] or false
+    local gcf_paths     = rlib.calls:gcflag( 'rlib_modules', 'paths' )
+
+    /*
+    *   functionality
+    */
+
+    console         ( pl, '\n\n [' .. base.manifest.name .. '] Active Modules' )
+    console         ( pl, lang( 'sym_sp' ) )
+
+    local c1_lbl    = sf( '%-20s', 'Module'      )
+    local c2_lbl    = sf( '%-15s', 'Version'     )
+    local c3_lbl    = sf( '%-15s', 'Author'      )
+    local c4_lbl    = sf( '%-20s', ( arg_param == gcf_paths and 'Path' ) or 'Description' )
+
+    console         ( pl, sf( ' %s %s %s %s', c1_lbl, c2_lbl, c3_lbl, c4_lbl ) )
+    console         ( pl, lang( 'sym_sp' ) )
+
+    for v in helper.get.data( rcore.modules, true ) do
+        local l1_d      = sf( '%-20s', tostring( helper.str:truncate( v.name, 20, '...' ) or 'err' ) )
+        local l2_d      = sf( '%-15s', tostring( rlib.modules:ver2str( v ) or 'err' ) )
+        local l3_d      = sf( '%-15s', tostring( v.author or 'err' ) )
+        local l4_d      = sf( '%-20s', tostring( helper.str:truncate( ( arg_param == gcf_paths and v.path ) or v.desc, 40, '...' ) or 'err' ) )
+        local resp      = sf( ' %s %s %s %s', l1_d, l2_d, l3_d, l4_d )
+
+        console( pl, Color( 255, 255, 0 ), resp )
+    end
+
+    console( pl, lang( 'sym_sp' ) )
+
 end
 
 /*
@@ -943,7 +1030,7 @@ function utils.cc_tools_asay( pl, cmd, args )
     *   check :: permissions
     */
 
-    if ( ccmd.no_console and base:isconsole( pl ) ) then
+    if ( ccmd.no_console and base.con:Is( pl ) ) then
         access:deny_console( pl, script, ccmd.id )
         return
     end
@@ -968,7 +1055,7 @@ function utils.cc_tools_asay( pl, cmd, args )
     */
 
     if helper.str:isempty( asay_message ) then
-        base.msg:route( pl, false, 'asay', 'cannot send empty message' )
+        route( pl, false, 'asay', 'cannot send empty message' )
         return
     end
 
@@ -999,7 +1086,7 @@ function utils.cc_tools_pco( pl, cmd, args )
     *   check :: permissions
     */
 
-    if ( ccmd.no_console and base:isconsole( pl ) ) then
+    if ( ccmd.no_console and base.con:Is( pl ) ) then
         access:deny_console( pl, script, ccmd.id )
         return
     end
@@ -1022,8 +1109,8 @@ function utils.cc_tools_pco( pl, cmd, args )
 
     -- no arg specified, simply return pco status
     if not arg_toggle then
-        local state = pl:GetNWBool( prefix .. 'tools.pco' ) and lang( 'opt_enabled' ) or lang( 'opt_disabled' )
-        base.msg:route( pl, false, script, 'pco is currently', cfg.cmsg.clrs.target, state )
+        local state = pl:GetNWBool( pf .. 'tools.pco' ) and lang( 'opt_enabled' ) or lang( 'opt_disabled' )
+        route( pl, false, script, 'pco is currently', cfg.cmsg.clrs.target, state )
         return
     end
 
@@ -1052,7 +1139,7 @@ function utils.cc_tools_rdo( pl, cmd, args )
     *   scope
     */
 
-    if ( ccmd.scope == 1 and not base:isconsole( pl ) ) then
+    if ( ccmd.scope == 1 and not base.con:Is( pl ) ) then
         access:deny_consoleonly( pl, script, ccmd.id )
         return
     end
@@ -1072,7 +1159,7 @@ function utils.cc_tools_rdo( pl, cmd, args )
 
     if not arg_toggle then
         local state = cfg.rdo.enabled and lang( 'opt_enabled' ) or lang( 'opt_disabled' )
-        base.msg:route( pl, false, script, 'rdo »', cfg.cmsg.clrs.target, state )
+        route( pl, false, script, 'rdo »', cfg.cmsg.clrs.target, state )
         return
     end
 
@@ -1080,7 +1167,56 @@ function utils.cc_tools_rdo( pl, cmd, args )
     rdo_rendermode( arg_state )
 
     local set_state = arg_state and lang( 'opt_enabled' ) or lang( 'opt_disabled' )
-    base.msg:route( pl, false, script, 'rdo »', cfg.cmsg.clrs.target, set_state )
+    route( pl, false, script, 'rdo »', cfg.cmsg.clrs.target, set_state )
+
+end
+
+/*
+*   concommand :: session
+*
+*   returns the current session id
+*/
+
+function utils.cc_session( pl, cmd, args )
+
+    /*
+    *   define command
+    */
+
+    local ccmd = base.calls:get( 'commands', 'rlib_session' )
+
+    /*
+    *   scope
+    */
+
+    if ( ccmd.scope == 1 and not base.con:Is( pl ) ) then
+        access:deny_consoleonly( pl, script, ccmd.id )
+        return
+    end
+
+    /*
+    *   perms
+    */
+
+    if not access:bIsRoot( pl ) then
+        access:deny_permission( pl, script, ccmd.id )
+        return
+    end
+
+    /*
+    *   check :: command disabled
+    */
+
+    if not ccmd.enabled then
+        log( 3, lang( 'setup_cmd_disabled' ) )
+        return
+    end
+
+    /*
+    *   return session id
+    */
+
+    route( pl, false, script, lang( 'lib_session_id', sys.startups ) )
 
 end
 
@@ -1102,7 +1238,7 @@ function utils.cc_setup( pl, cmd, args )
     *   scope
     */
 
-    if ( ccmd.scope == 1 and not base:isconsole( pl ) ) then
+    if ( ccmd.scope == 1 and not base.con:Is( pl ) ) then
         access:deny_consoleonly( pl, script, ccmd.id )
         return
     end
@@ -1121,7 +1257,7 @@ function utils.cc_setup( pl, cmd, args )
     */
 
     if not ccmd.enabled then
-        base:log( 3, lang( 'setup_cmd_disabled' ) )
+        log( 3, lang( 'setup_cmd_disabled' ) )
         return
     end
 
@@ -1129,9 +1265,9 @@ function utils.cc_setup( pl, cmd, args )
     *   check :: already has root usr
     */
 
-    local bHasRoot, rootuser = access:getroot( )
+    local bHasRoot, rootuser = access:root( )
     if bHasRoot then
-        base.msg:route( pl, false, script, lang( 'setup_root_exists' ), Color( 255, 255, 0 ), ( rootuser and rootuser.name ) or 'none' )
+        route( pl, false, script, lang( 'setup_root_exists' ), Color( 255, 255, 0 ), ( rootuser and rootuser.name ) or 'none' )
         return
     end
 
@@ -1140,7 +1276,7 @@ function utils.cc_setup( pl, cmd, args )
     */
 
     if not base:bInitialized( ) then
-        base.msg:route( pl, false, script, lang( 'lib_initialized' ) )
+        route( pl, false, script, lang( 'lib_initialized' ) )
         return
     end
 
@@ -1151,39 +1287,61 @@ function utils.cc_setup( pl, cmd, args )
     local target = args and args[ 1 ] or false
 
     if not target then
-        base.msg:route( pl, false, script, lang( 'user_find_errmsg' ) )
+        route( pl, false, script, lang( 'user_find_errmsg' ) )
         return
     end
 
     local c_results, result = helper.who:name_wc( target )
 
     if c_results > 1 then
-        base.msg:route( pl, false, script, lang( 'user_find_multires' ), cfg.cmsg.clrs.target, lang( 'user_find_quotes_ex' ) )
+        route( pl, false, script, lang( 'user_find_multires' ), cfg.cmsg.clrs.target, lang( 'user_find_quotes_ex' ) )
         return
     elseif not c_results or c_results < 1 then
         if sys.connections == 1 then
-            base.msg:route( pl, false, script, lang( 'user_find_nores_one' ) )
+            route( pl, false, script, lang( 'user_find_nores_one' ) )
         else
-            base.msg:route( pl, false, script, lang( 'user_find_nores' ), cfg.cmsg.clrs.target, lang( 'user_find_quotes_ex' ) )
+            route( pl, false, script, lang( 'user_find_nores' ), cfg.cmsg.clrs.target, lang( 'user_find_quotes_ex' ) )
         end
         return
     else
         if not helper.ok.ply( result[ 0 ] ) then
             if sys.connections == 1 then
-                base.msg:route( pl, false, script, lang( 'user_find_noply_one' ) )
+                route( pl, false, script, lang( 'user_find_noply_one' ) )
             else
-                base.msg:route( pl, false, script, lang( 'user_find_noply' ) )
+                route( pl, false, script, lang( 'user_find_noply' ) )
             end
             return
         else
-            result = result[ 0 ]
-            local bExists = access:writeuser( result )
+            result          = result[ 0 ]
+            local bExists   = access:writeuser( result )
 
             if bExists then return end
 
-            base:console( pl, ' ' )
-            base:console( pl, Color( 255, 255, 0 ), ' » Library Setup\n\n ', color_white, 'User ', Color( 255, 0, 255 ), result:Name( ), color_white, ' has been added with ', Color( 0, 255, 0 ), 'root access', color_white, ' and is protected.' )
-            base:console( pl, ' ' )
+            console( pl, 0 )
+            console( pl, 0 )
+            console( pl, lang( 'sym_sp' ) )
+            console( pl, Color( 255, 255, 0 ), '» Library Setup' )
+            console( pl, lang( 'sym_sp' ) )
+            console( pl, 0 )
+            console( pl, Color( 255, 255, 0 ), color_white, 'User ', Color( 255, 0, 255 ), result:Name( ), color_white, ' has been added with ', Color( 0, 255, 0 ), 'root access', color_white, ' and is protected.' )
+            console( pl, color_white, 'With root, you have access to all admin-based privledges and abilities that rlib utilizes.\n' )
+            console( pl, color_white, 'For more info; type ', Color( 0, 255, 0 ), 'rlib.manifest', color_white, ' in console and visit the docs URL\n' )
+            console( pl, lang( 'sym_sp' ) )
+            console( pl, 0 )
+            console( pl, color_white, 'Review the list of useful commands below to get started\n\n' )
+
+            /*
+            *   loop :: setup :: useful commands
+            */
+
+            for v in helper.get.data( rlib.calls:get( 'commands' ), true ) do
+                if not v.enabled or not v.showsetup then continue end
+
+                console( pl, Color( 255, 255, 0 ), '   ' .. v.id )
+            end
+
+            console( pl, 0 )
+            console( pl, lang( 'sym_sp' ) )
 
             -- update admins list for perms
             net.Start       ( 'rlib.user' )
@@ -1215,7 +1373,7 @@ function utils.cc_status( pl, cmd, args )
     *   scope
     */
 
-    if ( ccmd.scope == 1 and not base:isconsole( pl ) ) then
+    if ( ccmd.scope == 1 and not base.con:Is( pl ) ) then
         access:deny_consoleonly( pl, script, ccmd.id )
         return
     end
@@ -1233,26 +1391,26 @@ function utils.cc_status( pl, cmd, args )
     *   header output
     */
 
-    base:console( pl, '\n' )
+    console( pl, '\n' )
 
     local id_cat     = script or lang( 'lib_name' )
     local id_subcat  = ccmd.title or ccmd.name or lang( 'untitled' )
 
-    base:console( pl, sf( ' %s » %s', id_cat, id_subcat ) )
+    console( pl, sf( ' %s » %s', id_cat, id_subcat ) )
 
     /*
     *   manifest output
     */
 
-    base:console( pl, '\n' .. lang( 'sym_sp' ) )
+    console( pl, '\n' .. lang( 'sym_sp' ) )
 
     local l0_l      = sf( ' %s » %s', script, lang( 'manifest' ) )
     local l1_l      = sf( '%-20s', l0_l )
     local l2_l      = sf( '%-15s', '' )
     local l3_l      = sf( '%s %s', l1_l, l2_l )
 
-    base:console( pl, Color( 255, 0, 0 ), l3_l )
-    base:console( pl )
+    console( pl, Color( 255, 0, 0 ), l3_l )
+    console( pl )
 
     local data_about = helper.str:wordwrap( mf.about, 64 )
 
@@ -1268,7 +1426,7 @@ function utils.cc_status( pl, cmd, args )
             s1_l        = sf( '%-5s', ' » ' )
             l2_d        = sf( '%-15s', data_about[ 1 ] )
 
-            base:console( pl, Color( 255, 255, 0 ), l1_d, Color( 255, 0, 255 ), s1_l, Color( 255, 255, 255 ), l2_d )
+            console( pl, Color( 255, 255, 0 ), l1_d, Color( 255, 0, 255 ), s1_l, Color( 255, 255, 255 ), l2_d )
 
             for k, v in pairs( data_about ) do
                 if k == 1 then continue end -- hide the first line, already called in the initial col
@@ -1277,7 +1435,7 @@ function utils.cc_status( pl, cmd, args )
                 local l3_d = sf( '%-20s', '' )
                 local l4_d = sf( '%-15s', val )
 
-                base:console( pl, Color( 255, 255, 0 ), l3_d, Color( 255, 255, 255 ), '    ', Color( 255, 255, 255 ), l4_d )
+                console( pl, Color( 255, 255, 0 ), l3_d, Color( 255, 255, 255 ), '    ', Color( 255, 255, 255 ), l4_d )
             end
         else
             val = ( id == 'released' and os.date( '%m.%d.%Y', val ) ) or val
@@ -1286,7 +1444,7 @@ function utils.cc_status( pl, cmd, args )
             s1_l        = sf( '%-5s', ' » ' )
             l2_d        = sf( '%-15s', val )
 
-            base:console( pl, Color( 255, 255, 0 ), l1_d, Color( 255, 0, 255 ), s1_l, Color( 255, 255, 255 ), l2_d )
+            console( pl, Color( 255, 255, 0 ), l1_d, Color( 255, 0, 255 ), s1_l, Color( 255, 255, 255 ), l2_d )
         end
     end
 
@@ -1296,11 +1454,11 @@ function utils.cc_status( pl, cmd, args )
 
     local l1_d          = sf( '%-20s', ' ' .. lang( 'label_version' ) )
     local s1_l          = sf( '%-5s', ' » ' )
-    local l2_d          = sf( '%-15s', base.get:versionstr( ) )
+    local l2_d          = sf( '%-15s', base.get:ver2str_mf( ) )
 
-    base:console( pl, Color( 255, 255, 0 ), l1_d, Color( 255, 0, 255 ), s1_l, Color( 255, 255, 255 ), l2_d )
+    console( pl, Color( 255, 255, 0 ), l1_d, Color( 255, 0, 255 ), s1_l, Color( 255, 255, 255 ), l2_d )
 
-    base:console( pl, '\n\n' .. lang( 'sym_sp' ) )
+    console( pl, '\n\n' .. lang( 'sym_sp' ) )
 
     /*
     *   stats output
@@ -1311,8 +1469,8 @@ function utils.cc_status( pl, cmd, args )
     local l2_l          = sf( '%-15s', '' )
     local l3_l          = sf( '%s %s', l1_l, l2_l )
 
-    base:console( pl, Color( 255, 0, 0 ), l3_l )
-    base:console( pl )
+    console( pl, Color( 255, 0, 0 ), l3_l )
+    console( pl )
 
     local tbl_stats =
     {
@@ -1346,10 +1504,10 @@ function utils.cc_status( pl, cmd, args )
         cs_data         = sf( '%-5s', ' » ' )
         l2_d            = sf( '%-15s', val )
 
-        base:console( pl, Color( 255, 255, 0 ), l1_d, Color( 255, 0, 255 ), cs_data, Color( 255, 255, 255 ), l2_d )
+        console( pl, Color( 255, 255, 0 ), l1_d, Color( 255, 0, 255 ), cs_data, Color( 255, 255, 255 ), l2_d )
     end
 
-    base:console( pl, '\n\n' .. lang( 'sym_sp' ) )
+    console( pl, '\n\n' .. lang( 'sym_sp' ) )
 
     /*
     *   paths
@@ -1360,8 +1518,8 @@ function utils.cc_status( pl, cmd, args )
     local s2_lbl        = sf( '%-15s', '' )
     local s0_lbl        = sf( '%s %s', s1_lbl, s2_lbl )
 
-    base:console( pl, Color( 255, 0, 0 ), s0_lbl )
-    base:console( pl )
+    console( pl, Color( 255, 0, 0 ), s0_lbl )
+    console( pl )
 
     for l, m in SortedPairs( mf.paths ) do
         local id        = tostring( l )
@@ -1372,10 +1530,10 @@ function utils.cc_status( pl, cmd, args )
         ss_data         = sf( '%-5s', ' » ' )
         s2_data         = sf( '%-15s', val )
 
-        base:console( pl, Color( 255, 255, 0 ), s1_data, Color( 255, 0, 255 ), ss_data, Color( 255, 255, 255 ), s2_data )
+        console( pl, Color( 255, 255, 0 ), s1_data, Color( 255, 0, 255 ), ss_data, Color( 255, 255, 255 ), s2_data )
     end
 
-    base:console( pl, '\n\n' .. lang( 'sym_sp' ) )
+    console( pl, '\n\n' .. lang( 'sym_sp' ) )
 
     /*
     *   packages output
@@ -1387,12 +1545,12 @@ function utils.cc_status( pl, cmd, args )
     local pk3_lbl       = sf( '%-25s', '' )
     local pk0_lbl       = sf( '%s %s %s', pk1_lbl, pk2_lbl, pk3_lbl )
 
-    base:console( pl, Color( 255, 0, 0 ), pk0_lbl )
-    base:console( pl, lang( 'sym_sp' ) )
+    console( pl, Color( 255, 0, 0 ), pk0_lbl )
+    console( pl, lang( 'sym_sp' ) )
 
     for i, m in SortedPairs( base.pkgs.index ) do
         local id        = tostring( i )
-        local ver       = sf( '%s : %s', m.version, m.build )
+        local ver       = sf( '%s : %s', base.get:ver2str( m.version ), m.build )
         local desc      = tostring( helper.str:truncate( m.desc, 50, '...' ) or lang( 'none' ) )
 
         local pk1_data, pk2_data, pks_data = '', '', ''
@@ -1401,17 +1559,17 @@ function utils.cc_status( pl, cmd, args )
         pk2_data        = sf( '%-20s', ver )
         pk3_data        = sf( '%-25s', desc )
 
-        base:console( pl, Color( 255, 255, 0 ), pk1_data, Color( 255, 0, 255 ), pks_data, Color( 255, 255, 255 ), pk2_data, Color( 255, 255, 255 ), pk3_data )
+        console( pl, Color( 255, 255, 0 ), pk1_data, Color( 255, 0, 255 ), pks_data, Color( 255, 255, 255 ), pk2_data, Color( 255, 255, 255 ), pk3_data )
     end
 
-    base:console( pl, '\n\n' .. lang( 'sym_sp' ) )
+    console( pl, '\n\n' .. lang( 'sym_sp' ) )
 
     /*
     *   rcore output
     */
 
     if not istable( rcore ) then
-        base:console( pl, Color( 255, 0, 0 ), ' ', Color( 255, 0, 0 ), lang( 'status_rcore_missing' ) )
+        console( pl, Color( 255, 0, 0 ), ' ', Color( 255, 0, 0 ), lang( 'status_rcore_missing' ) )
         return
     end
 
@@ -1420,8 +1578,8 @@ function utils.cc_status( pl, cmd, args )
     local rc2_lbl = sf( '%-15s', '' )
     local rc0_lbl = sf( '%s %s', rc1_lbl, rc2_lbl )
 
-    base:console( pl, Color( 255, 0, 0 ), rc0_lbl )
-    base:console( pl )
+    console( pl, Color( 255, 0, 0 ), rc0_lbl )
+    console( pl )
 
     local tbl_modules =
     {
@@ -1442,7 +1600,7 @@ function utils.cc_status( pl, cmd, args )
         rcs_data = sf( '%-5s', ' » ' )
         rc2_data = sf( '%-15s', val )
 
-        base:console( pl, Color( 255, 255, 0 ), rc1_data, Color( 255, 0, 255 ), rcs_data, Color( 255, 255, 255 ), rc2_data )
+        console( pl, Color( 255, 255, 0 ), rc1_data, Color( 255, 0, 255 ), rcs_data, Color( 255, 255, 255 ), rc2_data )
     end
 
     /*
@@ -1457,14 +1615,14 @@ function utils.cc_status( pl, cmd, args )
     local ml5_lbl = sf( '%-70s', lang( 'sym_sp' ) )
     ml0_lbl = sf( ' %s %s %s %s %s\n%s', ml0_lbl, ml1_lbl, ml2_lbl, ml3_lbl, ml4_lbl, ml5_lbl )
 
-    base:console( pl, ml0_lbl )
+    console( pl, ml0_lbl )
 
     local clr_status = Color( 255, 255, 0 )
     for v in helper.get.data( rcore.modules ) do
         clr_status      = not v.enabled and Color( 255, 0, 0 ) or clr_status
 
         local name      = tostring( helper.str:truncate( v.name, 20, '...' ) or lang( 'err' ) )
-        local ver       = tostring( rcore:module_ver2str( v ) )
+        local ver       = tostring( rlib.modules:ver2str( v ) )
         local author    = tostring( v.author )
         local desc      = tostring( helper.str:truncate( v.desc, 40, '...' ) or lang( 'err' ) )
 
@@ -1475,7 +1633,7 @@ function utils.cc_status( pl, cmd, args )
         ml4_data = sf( '%-20s', desc )
         ml0_resp = sf( '%s %s %s %s %s', ml0_resp, ml1_data, ml2_data, ml3_data, ml4_data )
 
-        base:console( pl, clr_status, ml0_resp )
+        console( pl, clr_status, ml0_resp )
     end
 
 end
@@ -1498,7 +1656,7 @@ function utils.cc_packages( pl, cmd, args )
     *   scope
     */
 
-    if ( ccmd.scope == 1 and not rlib:isconsole( pl ) ) then
+    if ( ccmd.scope == 1 and not rlib.con:Is( pl ) ) then
         access:deny_consoleonly( pl, mf.name, ccmd.id )
         return
     end
@@ -1519,10 +1677,10 @@ function utils.cc_packages( pl, cmd, args )
     local id_cat     = script or lang( 'lib_name' )
     local id_subcat  = ccmd.title or ccmd.name or lang( 'untitled' )
 
-    base:console( pl, '\n' )
+    console( pl, '\n' )
 
     local c0_lbl = sf( ' %s » %s', id_cat, id_subcat )
-    base:console( pl, Color( 255, 0, 0 ), c0_lbl )
+    console( pl, Color( 255, 0, 0 ), c0_lbl )
 
     local output    = sf( '%-70s', ' -------------------------------------------------------------------------------------------\n' )
     local l1_l      = sf( '%-15s', lang( 'col_package' )   )
@@ -1532,20 +1690,20 @@ function utils.cc_packages( pl, cmd, args )
     local l5_l      = sf( '%-70s', ' -------------------------------------------------------------------------------------------' )
     output          = output .. sf( ' %s %s %s %s\n%s\n', l1_l, l2_l, l3_l, l4_l, l5_l )
 
-    base:console( pl, output )
+    console( pl, output )
 
     for v in helper.get.data( base.pkgs.index ) do
-        local l1_d, l2_d, l3_d, l4_d, output_data = '', '', '', '', ''
+        local l1_d, l2_d, l3_d, l4_d, resp = '', '', '', '', ''
         l1_d = sf( '%-15s', tostring( helper.str:truncate( v.name, 20, '...' ) or lang( 'err' ) ) )
         l2_d = sf( '%-15s', tostring( v.version ) or lang( 'err' ) )
         l3_d = sf( '%-15s', tostring( v.author ) or lang( 'err' ) )
         l4_d = sf( '%-20s', tostring( helper.str:truncate( v.desc, 40, '...' ) or lang( 'err' ) ) )
-        output_data = output_data .. sf( ' %s %s %s %s', l1_d, l2_d, l3_d, l4_d )
+        resp = resp .. sf( ' %s %s %s %s', l1_d, l2_d, l3_d, l4_d )
 
-        base:console( pl, Color( 255, 255, 0 ), output_data )
+        console( pl, Color( 255, 255, 0 ), resp )
     end
 
-    base:console( pl, '\n ' .. lang( 'sym_sp' ) )
+    console( pl, '\n ' .. lang( 'sym_sp' ) )
 
 end
 
@@ -1567,7 +1725,7 @@ function utils.cc_license( pl, cmd, args )
     *   scope
     */
 
-    if ( ccmd.scope == 1 and not base:isconsole( pl ) ) then
+    if ( ccmd.scope == 1 and not base.con:Is( pl ) ) then
         access:deny_consoleonly( pl, script, ccmd.id )
         return
     end
@@ -1585,7 +1743,7 @@ function utils.cc_license( pl, cmd, args )
     *   functionality
     */
 
-    base:console( pl, '\n' )
+    console( pl, '\n' )
 
     local id_cat        = script or lang( 'lib_name' )
     local id_subcat     = ccmd.title or ccmd.name or lang( 'untitled' )
@@ -1594,8 +1752,8 @@ function utils.cc_license( pl, cmd, args )
     local l2_l          = sf( '%-15s', '' )
     local l3_l          = sf( '%s %s', l1_l, l2_l )
 
-    base:console( pl, Color( 255, 0, 0 ), l3_l )
-    base:console( pl, lang( 'sym_sp' ) )
+    console( pl, Color( 255, 0, 0 ), l3_l )
+    console( pl, lang( 'sym_sp' ) )
 
     local data_about = helper.str:wordwrap( mf.license.text, 72 )
 
@@ -1611,7 +1769,7 @@ function utils.cc_license( pl, cmd, args )
             s1_l    = sf( '%-5s', ' » ' )
             l2_d    = sf( '%-15s', data_about[ 1 ] )
 
-            base:console( pl, Color( 255, 255, 0 ), l1_d, Color( 255, 0, 255 ), s1_l, Color( 255, 255, 255 ), l2_d )
+            console( pl, Color( 255, 255, 0 ), l1_d, Color( 255, 0, 255 ), s1_l, Color( 255, 255, 255 ), l2_d )
 
             for k, v in pairs( data_about ) do
                 if k == 1 then continue end -- hide first line
@@ -1620,20 +1778,20 @@ function utils.cc_license( pl, cmd, args )
                 local l3_d = sf( '%-10s', '' )
                 local l4_d = sf( '%-15s', val )
 
-                base:console( pl, Color( 255, 255, 0 ), l3_d, Color( 255, 255, 255 ), '    ', Color( 255, 255, 255 ), l4_d )
+                console( pl, Color( 255, 255, 0 ), l3_d, Color( 255, 255, 255 ), '    ', Color( 255, 255, 255 ), l4_d )
             end
-            base:console( pl, '' )
+            console( pl, '' )
         else
             l1_d    = sf( '%-10s', ' ' .. id )
             s1_l    = sf( '%-5s', ' » ' )
             l2_d    = sf( '%-15s', val )
 
-            base:console( pl, Color( 255, 255, 0 ), l1_d, Color( 255, 0, 255 ), s1_l, Color( 255, 255, 255 ), l2_d )
+            console( pl, Color( 255, 255, 0 ), l1_d, Color( 255, 0, 255 ), s1_l, Color( 255, 255, 255 ), l2_d )
         end
 
     end
 
-    base:console( pl, lang( 'sym_sp' ) )
+    console( pl, lang( 'sym_sp' ) )
 
 end
 
@@ -1655,7 +1813,7 @@ function utils.cc_oort( pl, cmd, args )
     *   scope
     */
 
-    if ( ccmd.scope == 1 and not base:isconsole( pl ) ) then
+    if ( ccmd.scope == 1 and not base.con:Is( pl ) ) then
         access:deny_consoleonly( pl, script, ccmd.id )
         return
     end
@@ -1674,7 +1832,7 @@ function utils.cc_oort( pl, cmd, args )
     */
 
     local has_oort = oort and lang( 'opt_enabled' ) or lang( 'opt_disabled' )
-    base.msg:route( pl, false, script, 'Oort Engine', cfg.cmsg.clrs.target, '[' .. has_oort .. ']' )
+    route( pl, false, script, 'Oort Engine', cfg.cmsg.clrs.target, '[' .. has_oort .. ']' )
 end
 
 /*
@@ -1701,16 +1859,16 @@ local function restart_cancel( pl )
         bIsActive = true
     end
 
-    hook.Remove( 'Tick', prefix .. 'timer.srv.restart' )
+    hook.Remove( 'Tick', pf .. 'timer.srv.restart' )
 
     if not bIsActive then
         rlib:log( 1, lang( 'restart_none_active' ) )
         return false
     end
 
-    local admin_name = base:isconsole( pl ) and lang( 'console' ) or pl:Name( )
+    local admin_name = base.con:Is( pl ) and lang( 'console' ) or pl:Name( )
 
-    base.msg:route( nil, true, script, 'Server restart', cfg.cmsg.clrs.target_tri, 'CANCELLED' )
+    route( nil, true, script, 'Server restart', cfg.cmsg.clrs.target_tri, 'CANCELLED' )
     storage:log( 7, false, '[ %s ] » cancelled an active server restart', admin_name )
     rlib:log( 4, 'server restart cancelled by player [ %s ]', admin_name )
 
@@ -1735,7 +1893,7 @@ function utils.cc_restart( pl, cmd, args )
     *   scope
     */
 
-    if ( ccmd.scope == 1 and not base:isconsole( pl ) ) then
+    if ( ccmd.scope == 1 and not base.con:Is( pl ) ) then
         access:deny_consoleonly( pl, script, ccmd.id )
         return
     end
@@ -1764,7 +1922,7 @@ function utils.cc_restart( pl, cmd, args )
     end
 
     if not timex.exists( 'rlib_cmd_srv_restart' ) then
-        local admin_name = base:isconsole( pl ) and lang( 'console' ) or pl:Name( )
+        local admin_name = base.con:Is( pl ) and lang( 'console' ) or pl:Name( )
 
         storage:log( 7, false, '[ %s ] » forced a server restart', admin_name )
         rlib:log( 4, '[ %s ] » forced a server restart', admin_name )
@@ -1773,7 +1931,7 @@ function utils.cc_restart( pl, cmd, args )
             rlib:log( 4, lang( 'restart_now' ) )
         end )
 
-        base.msg:route( nil, true, script, 'Server restart in', cfg.cmsg.clrs.target_tri, tostring( restart_timer ), cfg.cmsg.clrs.msg, 'seconds' )
+        route( nil, true, script, 'Server restart in', cfg.cmsg.clrs.target_tri, tostring( restart_timer ), cfg.cmsg.clrs.msg, 'seconds' )
     end
 end
 
@@ -1798,7 +1956,7 @@ function utils.cc_timed_restart( pl, cmd, args )
     *   scope
     */
 
-    if ( ccmd.scope == 1 and not base:isconsole( pl ) ) then
+    if ( ccmd.scope == 1 and not base.con:Is( pl ) ) then
         access:deny_consoleonly( pl, script, ccmd.id )
         return
     end
@@ -1830,7 +1988,7 @@ function utils.cc_timed_restart( pl, cmd, args )
     local timex_cd      = 10 -- when to start the second-by-second last countdown
 
     if tonumber( arg_time ) > 300 then
-        base.msg:route( pl, false, 'RESTART', 'Forced restart time cannot exceed', cfg.cmsg.clrs.target_tri, '300', cfg.cmsg.clrs.msg, 'seconds' )
+        route( pl, false, 'RESTART', 'Forced restart time cannot exceed', cfg.cmsg.clrs.target_tri, '300', cfg.cmsg.clrs.msg, 'seconds' )
         return
     end
 
@@ -1838,9 +1996,9 @@ function utils.cc_timed_restart( pl, cmd, args )
 
     if not timex.exists( 'rlib_cmd_srv_restart_delay' ) then
 
-        local admin_name = base:isconsole( pl ) and lang( 'console' ) or pl:Name( )
+        local admin_name = base.con:Is( pl ) and lang( 'console' ) or pl:Name( )
 
-        base.msg:route( nil, true, script, 'Server will restart in', cfg.cmsg.clrs.target_tri, tostring( arg_time ), cfg.cmsg.clrs.msg, 'seconds' )
+        route( nil, true, script, 'Server will restart in', cfg.cmsg.clrs.target_tri, tostring( arg_time ), cfg.cmsg.clrs.msg, 'seconds' )
         rlib:log( 4, 'Server restart in [ %s ] seconds', arg_time )
         storage:log( 7, false, '[ %s ] has forced a timed server restart in [ %i ] seconds', admin_name, arg_time )
 
@@ -1848,7 +2006,7 @@ function utils.cc_timed_restart( pl, cmd, args )
         timex.create( 'rlib_cmd_srv_restart_delay', arg_time, 1, function( )
             rlib:log( 4, lang( 'restart_now' ) )
             for v in helper.get.ents( ) do v:SetPos( Vector( 99999999999999999, 0, 0 ) ) end
-            hook.Remove( 'Tick', prefix .. 'timer.srv.restart' )
+            hook.Remove( 'Tick', pf .. 'timer.srv.restart' )
         end )
 
         local function restart_execute( )
@@ -1858,7 +2016,7 @@ function utils.cc_timed_restart( pl, cmd, args )
                     if exec_cd ~= 11 then
                         local term = ( exec_cd == 1 ) and 'second' or 'seconds'
                         if ULib then ULib.csay( _, 'Server restart in [ ' .. tostring( exec_cd ) .. ' ] ' .. term ) end
-                        base.msg:route( nil, true, script, 'Server restart in', cfg.cmsg.clrs.target_tri, tostring( exec_cd ), cfg.cmsg.clrs.msg, term )
+                        route( nil, true, script, 'Server restart in', cfg.cmsg.clrs.target_tri, tostring( exec_cd ), cfg.cmsg.clrs.msg, term )
                         rlib:log( 4, 'Server restart in [ %s ] %s', tostring( exec_cd ), term )
                     end
                     exec_cd = exec_cd - 1
@@ -1866,13 +2024,13 @@ function utils.cc_timed_restart( pl, cmd, args )
             end
         end
 
-        hook.Add( 'Tick', prefix .. 'timer.srv.restart', function( )
+        hook.Add( 'Tick', pf .. 'timer.srv.restart', function( )
             local timex_remains    = timex.remains( 'rlib_cmd_srv_restart_wait' )
             timex_remains           = math.Round( timex_remains )
 
             if ( timex_remains == time_step2 and not step2_OK ) and not timex.exists( 'rlib_cmd_srv_restart_wait_s2' ) then
                 timex.create( 'rlib_cmd_srv_restart_wait_s2', 0.01, 1, function( )
-                    base.msg:route( nil, true, script, 'Server restart in', cfg.cmsg.clrs.target_tri, tostring( time_step2 ), cfg.cmsg.clrs.msg, 'seconds' )
+                    route( nil, true, script, 'Server restart in', cfg.cmsg.clrs.target_tri, tostring( time_step2 ), cfg.cmsg.clrs.msg, 'seconds' )
                     rlib:log( 4, 'Server restart in [ %s ] seconds', tostring( time_step2 ) )
                     step2_OK = true
                 end )
@@ -1881,7 +2039,7 @@ function utils.cc_timed_restart( pl, cmd, args )
             if ( timex_remains == timex_cd and not step3_OK ) and not timex.exists( 'rlib_cmd_srv_restart_wait_s3_p1' ) then
                 timex.create( 'rlib_cmd_srv_restart_wait_s3_p1', 0.01, 1, function( )
                     step3_OK = true
-                    hook.Remove( 'Tick', prefix .. 'timer.srv.restart' )
+                    hook.Remove( 'Tick', pf .. 'timer.srv.restart' )
                     restart_execute( )
                 end )
             end
