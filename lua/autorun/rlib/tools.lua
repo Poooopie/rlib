@@ -287,7 +287,7 @@ function tools.welcome:Run( )
     :title                  ( lang( 'welcome_title' )           )
     :actshow                (                                   )
 end
-rcc.new.gmod( pid( 'welcome' ), tools.welcome.Run )
+rcc.new.gmod( pid( 'welcome' ), tools.welcome.Run, nil, nil, FCVAR_PROTECTED )
 
 /*
 *   netlib :: konsole
