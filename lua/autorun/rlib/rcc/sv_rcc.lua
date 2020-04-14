@@ -566,9 +566,9 @@ local function rcc_checksum_verify( pl, cmd, args, str )
     */
 
     local l1_l      = sf( '%-40s',    lang( 'col_file'        ) )
-    local l2_l      = sf( '%-15s',    lang( 'col_verified'    ) )
+    local l2_l      = sf( '%-45s',    lang( 'col_verified'    ) )
     local l3_l      = sf( '%-5s',     lang( 'sym_arrow'       ) )
-    local l4_l      = sf( '%-15s',    lang( 'col_current'     ) )
+    local l4_l      = sf( '%-45s',    lang( 'col_current'     ) )
 
     con( pl, clr_w, l1_l, Color( 0, 255, 0 ), l2_l, clr_w, l3_l, clr_r, l4_l )
     con( pl )
@@ -577,13 +577,13 @@ local function rcc_checksum_verify( pl, cmd, args, str )
     for k, v in pairs( checksums ) do
         if not v.verified or not v.current then continue end
 
-        local verified  = v.verified:sub( -7 )
-        local current   = v.current:sub( -7 )
+        local verified  = v.verified
+        local current   = v.current
 
         local l1_d      = sf( '%-40s',  k           )
-        local l2_d      = sf( '%-15s',  verified    )
+        local l2_d      = sf( '%-45s',  verified    )
         local l3_d      = sf( '%-5s',   '»'         )
-        local l4_d      = sf( '%-15s',  current     )
+        local l4_d      = sf( '%-45s',  current     )
 
         con( pl, clr_y, l1_d, Color( 0, 255, 0 ), l2_d, clr_w, l3_d, clr_r, l4_d )
 
