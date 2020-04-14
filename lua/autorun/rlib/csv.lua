@@ -148,6 +148,7 @@ local net_register =
     'rlib.user',
     'rlib.user.join',
     'rlib.user.update',
+    'rlib.welcome',
 }
 
 for k, v in pairs( net_register ) do
@@ -1073,13 +1074,19 @@ end
 *   rlib :: setup :: kill task
 *
 *   destroys the timers and hooks associated to the setup notice that displays when a server has not had a root user registered
+*
+*   @param  : ply pl
 */
 
-function base:setup_killtask( )
+function base:setup_killtask( pl )
     timex.expire( 'rlib_noroot_notice' )
     rhook.drop.gmod( 'Think', 'rlib_noroot_notice' )
 
     base.oort:Authorize( )
+
+    timex.simple( 1, function( )
+        pl:ConCommand( pid( 'welcome' ) )
+    end )
 end
 
 /*
@@ -1372,7 +1379,7 @@ local function psay_setup( pl, text )
     *   destroy noroot timer / hook
     */
 
-    base:setup_killtask( )
+    base:setup_killtask( pl )
 
 end
 hook.Add( 'PlayerSay', pid( 'psay.lib.setup' ), psay_setup )
@@ -2442,6 +2449,28 @@ local function netlib_udm_check( len, pl )
     coroutine.resume( task_udm )
 end
 net.Receive( 'rlib.udm.check', netlib_udm_check )
+
+/*
+*   netlib :: udm check
+*
+*   checks the host server for any updates to rlib
+*/
+
+local function netlib_welcome( len, pl )
+
+    local auth_id               = base.oort:AuthID( )
+    auth_id                     = tostring( auth_id )
+
+    local bHasRoot, rootuser    = access:root( )
+    local owner                 = bHasRoot and istable( rootuser ) and rootuser.name or 'unclaimed'
+    owner                       = tostring( owner )
+
+    net.Start                   ( 'rlib.welcome'    )
+    net.WriteString             ( auth_id           )
+    net.WriteString             ( owner             )
+    net.Send                    ( pl                )
+end
+net.Receive( 'rlib.welcome', netlib_welcome )
 
 /*
 *   advanced logging which allows for any client-side errors to be sent to the server as well.

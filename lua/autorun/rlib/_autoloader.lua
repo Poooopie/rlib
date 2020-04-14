@@ -51,7 +51,7 @@ function rlib.autoload:Run( parent )
     mf.repo                     = 'https://github.com/im-richard/rlib/'
     mf.docs                     = 'https://docs.rlib.io/'
     mf.about                    = [[rlib is a glua library written for garrys mod which contains a variety of commonly used functions that are required for certain scripts to run properly. Package includes both rlib + rcore which act as the overall foundation which other scripts will rest within as a series of modules. ]]
-    mf.released                 = 1586676301
+    mf.released                 = 1586850509
     mf.version                  = { 3, 1, 0 }
     mf.showcopyright            = true
 
@@ -280,7 +280,7 @@ function rlib.autoload:Run( parent )
         */
 
         base.t = base.t or { }
-        local to_tools = { 'alogs', 'asay', 'dc', 'konsole', 'pco', 'rdo', 'language', 'rmain', 'mviewer', 'rcfg', 'report' }
+        local to_tools = { 'alogs', 'asay', 'dc', 'konsole', 'pco', 'rdo', 'language', 'rmain', 'mviewer', 'rcfg', 'report', 'welcome' }
         for k, v in ipairs( to_tools ) do
             base.t[ v ] = { }
         end

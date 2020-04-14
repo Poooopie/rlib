@@ -503,6 +503,24 @@ end
         }
     }
 
+
+
+    cfg.welcome =
+    {
+        ticker =
+        {
+            clr         = Color( 120, 120, 120, 255 ),
+            speed       = 1.0,
+            delay       = 3,
+            msgs =
+            {
+                'THANKS FOR USING [LIB] [VERSION]',
+                '[VERSION] -- be sure to check out our links for more information!',
+                'Click the servers tab to visit our other garrys mod servers.',
+            }
+        }
+    }
+
 /*
 *   services :: precaching
 */

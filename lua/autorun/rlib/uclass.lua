@@ -1736,6 +1736,32 @@ local uclass = { }
     uclass.ocrv       = uclass.onclick_rv
 
     /*
+    *   ui :: class :: onclick :: fade out
+    *
+    *   @alias  : onclick_fadeout, ocfo
+    *
+    *   @param  : pnl panel
+    *   @param  : int delay
+    *   @param  : bool bHide
+    */
+
+    function uclass.onclick_fadeout( pnl, panel, delay, bHide )
+        pnl[ 'DoClick' ] = function( s, ... )
+            if not ui:valid( panel ) then return end
+            delay   = isnumber( delay ) and delay or 1
+
+            panel:AlphaTo( 0, delay, 0, function( )
+                if bHide then
+                    ui:hide( panel )
+                else
+                    ui:destroy( panel )
+                end
+            end )
+        end
+    end
+    uclass.ocfo = uclass.onclick_fadeout
+
+    /*
     *   ui :: class :: onremove
     *
     *   @alias  : onremove, remove, orem

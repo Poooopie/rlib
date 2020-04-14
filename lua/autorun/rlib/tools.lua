@@ -172,10 +172,18 @@ end
 function tools.rcfg:Run( )
     if not access:bIsDev( LocalPlayer( ) ) and not access:bIsRoot( LocalPlayer( ) ) then return end
 
+    /*
+    *   destroy existing pnl
+    */
+
     if ui:valid( self.pnl ) then
         ui:destroy( self.pnl )
         return
     end
+
+    /*
+    *   create / show parent pnl
+    */
 
     self.pnl                = ui.new( 'rlib.lo.rcfg'            )
     :title                  ( lang( 'lib_addons_title' )        )
@@ -200,13 +208,17 @@ function tools.rmain:Run( )
     net.SendToServer        (                   )
 
     /*
-    *   about :: create / show parent pnl
+    *   destroy existing pnl
     */
 
     if ui:valid( self.pnl ) then
         ui:destroy( self.pnl )
         return
     end
+
+    /*
+    *   create / show parent pnl
+    */
 
     self.pnl                = ui.new( 'rlib.lo.about'           )
     :title                  ( lang( 'title_about' )             )
@@ -223,16 +235,59 @@ rcc.new.gmod( pid( 'about' ), tools.rmain.Run )
 function tools.report:Run( )
     if not access:bIsDev( LocalPlayer( ) ) and not access:bIsRoot( LocalPlayer( ) ) then return end
 
+    /*
+    *   destroy existing pnl
+    */
+
     if ui:valid( self.pnl ) then
         ui:destroy( self.pnl )
         return
     end
+
+    /*
+    *   create / show parent pnl
+    */
 
     self.pnl                = ui.new( 'rlib.lo.report'          )
     :title                  ( lang( 'reports_title' )           )
     :actshow                (                                   )
 end
 rcc.new.gmod( pid( 'report' ), tools.report.Run )
+
+/*
+*	tools :: welcome :: run
+*
+*	welcome interface for ?setup
+*/
+
+function tools.welcome:Run( )
+    if not access:bIsDev( LocalPlayer( ) ) and not access:bIsRoot( LocalPlayer( ) ) then return end
+
+    /*
+    *   destroy existing pnl
+    */
+
+    if ui:valid( self.pnl ) then
+        ui:destroy( self.pnl )
+        return
+    end
+
+    /*
+    *   about :: network update check
+    */
+
+    net.Start               ( 'rlib.welcome'    )
+    net.SendToServer        (                   )
+
+    /*
+    *   create / show parent pnl
+    */
+
+    self.pnl                = ui.new( 'rlib.lo.welcome'         )
+    :title                  ( lang( 'welcome_title' )           )
+    :actshow                (                                   )
+end
+rcc.new.gmod( pid( 'welcome' ), tools.welcome.Run )
 
 /*
 *   netlib :: konsole

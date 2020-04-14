@@ -369,6 +369,7 @@ base.language =
         setup_root_exists                   = 'server is registered to user » ',
         setup_root_give_sa                  = 'must give yourself superadmin group first',
         search_no_results                   = 'no results found',
+        welcome_title                       = 'Welcome',
         ws_no_steam_data                    = 'no steam data',
         ws_no_response                      = 'no response from steam workshop » [ %s ]',
         ws_response_empty                   = 'response from steam workshop empty -- down?',

@@ -146,41 +146,55 @@ reg_font( pref( 'report_auth_icon' ),                   { size = 24, weight = 10
 *    fonts :: interface :: mviewer
 */
 
-reg_font( pref( 'mviewer_exit' ),                   { size = 24, weight = 800, antialias = true, font = 'Roboto' } )
-reg_font( pref( 'mviewer_resizer' ),                { size = 24, weight = 100, antialias = true, font = 'Roboto Light' } )
-reg_font( pref( 'mviewer_icon' ),                   { size = 24, weight = 100, antialias = true, font = 'Roboto Light' } )
-reg_font( pref( 'mviewer_name' ),                   { size = 44, weight = 100, antialias = true, font = 'Roboto Light' } )
-reg_font( pref( 'mviewer_title' ),                  { size = 16, weight = 600, antialias = true, shadow = true, font = 'Roboto Light' } )
-reg_font( pref( 'mviewer_clear' ),                  { size = 20, weight = 800, antialias = true, font = 'Roboto' } )
-reg_font( pref( 'mviewer_enter' ),                  { size = 20, weight = 800, antialias = true, font = 'Roboto' } )
-reg_font( pref( 'mviewer_control' ),                { size = 16, weight = 200, antialias = true, font = 'Roboto Condensed' } )
-reg_font( pref( 'mviewer_searchbox' ),              { size = 18, weight = 100, antialias = true, font = 'Roboto Light' } )
-reg_font( pref( 'mviewer_minfo' ),                  { size = 16, weight = 400, antialias = true, font = 'Roboto Light' } )
-reg_font( pref( 'mviewer_copyclip' ),               { size = 14, weight = 100, antialias = true, shadow = true, font = 'Roboto Light' } )
+reg_font( pref( 'mviewer_exit' ),                       { size = 24, weight = 800, antialias = true, font = 'Roboto' } )
+reg_font( pref( 'mviewer_resizer' ),                    { size = 24, weight = 100, antialias = true, font = 'Roboto Light' } )
+reg_font( pref( 'mviewer_icon' ),                       { size = 24, weight = 100, antialias = true, font = 'Roboto Light' } )
+reg_font( pref( 'mviewer_name' ),                       { size = 44, weight = 100, antialias = true, font = 'Roboto Light' } )
+reg_font( pref( 'mviewer_title' ),                      { size = 16, weight = 600, antialias = true, shadow = true, font = 'Roboto Light' } )
+reg_font( pref( 'mviewer_clear' ),                      { size = 20, weight = 800, antialias = true, font = 'Roboto' } )
+reg_font( pref( 'mviewer_enter' ),                      { size = 20, weight = 800, antialias = true, font = 'Roboto' } )
+reg_font( pref( 'mviewer_control' ),                    { size = 16, weight = 200, antialias = true, font = 'Roboto Condensed' } )
+reg_font( pref( 'mviewer_searchbox' ),                  { size = 18, weight = 100, antialias = true, font = 'Roboto Light' } )
+reg_font( pref( 'mviewer_minfo' ),                      { size = 16, weight = 400, antialias = true, font = 'Roboto Light' } )
+reg_font( pref( 'mviewer_copyclip' ),                   { size = 14, weight = 100, antialias = true, shadow = true, font = 'Roboto Light' } )
 
 /*
 *    fonts :: interface :: konsole
 */
 
-reg_font( pref( 'konsole_exit' ),                   { size = 24, weight = 800, antialias = true, font = 'Roboto' } )
-reg_font( pref( 'konsole_icon' ),                { size = 24, weight = 100, antialias = true, font = 'Roboto Light' } )
-reg_font( pref( 'konsole_resizer' ),             { size = 24, weight = 100, antialias = true, font = 'Roboto Light' } )
-reg_font( pref( 'konsole_gear' ),                { size = 32, weight = 800, antialias = true, font = 'Roboto' } )
-reg_font( pref( 'konsole_clear' ),               { size = 20, weight = 800, antialias = true, font = 'Roboto' } )
-reg_font( pref( 'konsole.copy' ),                { size = 20, weight = 100, antialias = true, font = 'Roboto' } )
-reg_font( pref( 'konsole_title' ),               { size = 16, weight = 600, antialias = true, font = 'Roboto Light' } )
-reg_font( pref( 'konsole_text' ),                { size = 13, weight = 400, antialias = true, font = 'Roboto' } )
-reg_font( pref( 'konsole_textfield' ),           { size = 14, weight = 600, antialias = true, font = 'Roboto Light' } )
-reg_font( pref( 'konsole_input_icon' ),          { size = 24, weight = 100, antialias = true, font = 'Roboto Light' } )
-reg_font( pref( 'konsole_cbox_label' ),          { size = 13, weight = 400, antialias = true, font = 'Roboto' } )
+reg_font( pref( 'konsole_exit' ),                       { size = 24, weight = 800, antialias = true, font = 'Roboto' } )
+reg_font( pref( 'konsole_icon' ),                       { size = 24, weight = 100, antialias = true, font = 'Roboto Light' } )
+reg_font( pref( 'konsole_resizer' ),                    { size = 24, weight = 100, antialias = true, font = 'Roboto Light' } )
+reg_font( pref( 'konsole_gear' ),                       { size = 32, weight = 800, antialias = true, font = 'Roboto' } )
+reg_font( pref( 'konsole_clear' ),                      { size = 20, weight = 800, antialias = true, font = 'Roboto' } )
+reg_font( pref( 'konsole.copy' ),                       { size = 20, weight = 100, antialias = true, font = 'Roboto' } )
+reg_font( pref( 'konsole_title' ),                      { size = 16, weight = 600, antialias = true, font = 'Roboto Light' } )
+reg_font( pref( 'konsole_text' ),                       { size = 13, weight = 400, antialias = true, font = 'Roboto' } )
+reg_font( pref( 'konsole_textfield' ),                  { size = 14, weight = 600, antialias = true, font = 'Roboto Light' } )
+reg_font( pref( 'konsole_input_icon' ),                 { size = 24, weight = 100, antialias = true, font = 'Roboto Light' } )
+reg_font( pref( 'konsole_cbox_label' ),                 { size = 13, weight = 400, antialias = true, font = 'Roboto' } )
 
 /*
 *    fonts :: interface :: dc
 */
 
-reg_font( pref( 'dc_exit' ),                    { size = 24, weight = 800, antialias = true, font = 'Roboto' } )
-reg_font( pref( 'dc_icon' ),                    { size = 24, weight = 100, antialias = true, font = 'Roboto Light' } )
-reg_font( pref( 'dc_name' ),                    { size = 24, weight = 100, antialias = true, font = 'Roboto Light' } )
-reg_font( pref( 'dc_title' ),                   { size = 16, weight = 600, antialias = true, font = 'Roboto Light' } )
-reg_font( pref( 'dc_msg' ),                     { size = 16, weight = 600, antialias = true, font = 'Roboto Light' } )
-reg_font( pref( 'dc_btn' ),                     { size = 22, weight = 200, antialias = true, font = 'Roboto' } )
+reg_font( pref( 'dc_exit' ),                            { size = 24, weight = 800, antialias = true, font = 'Roboto' } )
+reg_font( pref( 'dc_icon' ),                            { size = 24, weight = 100, antialias = true, font = 'Roboto Light' } )
+reg_font( pref( 'dc_name' ),                            { size = 24, weight = 100, antialias = true, font = 'Roboto Light' } )
+reg_font( pref( 'dc_title' ),                           { size = 16, weight = 600, antialias = true, font = 'Roboto Light' } )
+reg_font( pref( 'dc_msg' ),                             { size = 16, weight = 600, antialias = true, font = 'Roboto Light' } )
+reg_font( pref( 'dc_btn' ),                             { size = 22, weight = 200, antialias = true, font = 'Roboto' } )
+
+/*
+*   fonts :: interface :: welcome
+*/
+
+reg_font( pref( 'welcome_exit' ),                       { size = 36, weight = 800, antialias = true, font = 'Roboto Light' } )
+reg_font( pref( 'welcome_icon' ),                       { size = 24, weight = 100, antialias = true, font = 'Roboto Light' } )
+reg_font( pref( 'welcome_title' ),                      { size = 16, weight = 600, antialias = true, font = 'Roboto Light' } )
+reg_font( pref( 'welcome_name' ),                       { size = 40, weight = 100, antialias = true, font = 'Segoe UI Light' } )
+reg_font( pref( 'welcome_intro' ),                      { size = 20, weight = 100, antialias = true, font = 'Open Sans Light' } )
+reg_font( pref( 'welcome_ticker' ),                     { size = 14, weight = 100, antialias = true, font = 'Open Sans' } )
+reg_font( pref( 'welcome_btn' ),                        { size = 16, weight = 400, antialias = true, font = 'Roboto Light' } )
+reg_font( pref( 'welcome_data' ),                       { size = 12, weight = 200, antialias = true, font = 'Roboto Light' } )
+reg_font( pref( 'welcome_fx' ),                         { size = 150, weight = 100, antialias = true, font = 'Roboto Light' } )
