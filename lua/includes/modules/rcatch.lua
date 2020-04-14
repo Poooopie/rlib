@@ -1,11 +1,11 @@
 /*
-*   @package        rlib
-*	@module			rcatch
-*   @author         Richard [http://steamcommunity.com/profiles/76561198135875727]
-*   @copyright      (C) 2020 - 2020
-*   @since          3.0.0
-*   @website        https://rlib.io
-*   @docs           https://docs.rlib.io
+*   @package        : rlib
+*   @module         : rcatch
+*   @author         : Richard [http://steamcommunity.com/profiles/76561198135875727]
+*   @copyright      : (C) 2020 - 2020
+*   @since          : 3.0.0
+*   @website        : https://rlib.io
+*   @docs           : https://docs.rlib.io
 * 
 *   MIT License
 *
@@ -19,7 +19,7 @@
 local VERSION 	= '1.0.0'
 require( 'rclass' )
 local CLASS 	= include( 'rclass.lua' )
-if SERVER then AddCSLuaFile( 'includes/modules/rclass.lua' ) end
+				if SERVER then AddCSLuaFile( 'includes/modules/rclass.lua' ) end
 
 				assert( CLASS, 'rCatch: missing rClass' )
 

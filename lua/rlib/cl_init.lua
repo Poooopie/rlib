@@ -50,7 +50,7 @@ end
 *   sends a message directly to the ply chat
 */
 
-local function netlib_sms_umsg( len, ply )
+local function netlib_sms_umsg( len, pl )
     local msg = net.ReadTable( )
     if not msg then return end
     chat.AddText( unpack( msg ) )
@@ -63,7 +63,7 @@ net.Receive( 'rlib.sms.umsg', netlib_sms_umsg )
 *   sends a message directly to the ply console
 */
 
-local function netlib_sms_konsole( len, ply )
+local function netlib_sms_konsole( len, pl )
     local msg = net.ReadTable( )
     if not msg then return end
     table.insert( msg, '\n' )
@@ -77,7 +77,7 @@ net.Receive( 'rlib.sms.konsole', netlib_sms_konsole )
 *   sends a standard notification directly to the ply screen
 */
 
-local function netlib_sms_notify( len, ply )
+local function netlib_sms_notify( len, pl )
     local args  = net.ReadTable( )
     local cat   = args and args[ 1 ] or 1
     local msg   = args and args[ 2 ] or ''
@@ -96,7 +96,7 @@ net.Receive( 'rlib.sms.notify', netlib_sms_notify )
 *   slides in from the right side.
 */
 
-local function netlib_sms_inform( len, ply )
+local function netlib_sms_inform( len, pl )
     local args  = net.ReadTable( )
     local cat   = args and args[ 1 ] or 1
     local msg   = args and args[ 2 ] or ''
@@ -106,6 +106,24 @@ local function netlib_sms_inform( len, ply )
     design:inform( cat, msg, title, dur )
 end
 net.Receive( 'rlib.sms.inform', netlib_sms_inform )
+
+/*
+*   netlib :: bubble :: bc
+*
+*   sends a bubble msg that displays to the bottom right of the
+*   players screen
+*/
+
+local function netlib_sms_bubble( len, pl )
+    local args      = net.ReadTable( )
+    local msg       = args and args[ 1 ] or ''
+    local dur       = args and isnumber( args[ 2 ] ) and args[ 2 ] or nil
+    local clr_box   = args and IsColor( args[ 3 ] ) and args[ 3 ] or nil
+    local clr_txt   = args and IsColor( args[ 4 ] ) and args[ 4 ] or nil
+
+    design:bubble( msg, dur, clr_box, clr_txt )
+end
+net.Receive( 'rlib.sms.bubble', netlib_sms_bubble )
 
 /*
 *   get material data
@@ -140,10 +158,7 @@ function base:mats_get( src, mod )
 
     suffix = suffix and suffix:lower( )
 
-    local mat_ref = 'm_' .. src
-    if suffix then
-        mat_ref = 'm_' .. suffix .. '_' .. src
-    end
+    local mat_ref = ( not suffix and 'm_' .. src ) or ( 'm_' .. suffix .. '_' .. src )
 
     return rlib.m[ mat_ref ] or mat_ref or ''
 end
@@ -159,28 +174,28 @@ end
 *   @ex     : rlib.m:get( 'btn_menu_steam', mod )
 *           : rlib.m:get( 'btn_menu_steam', 'mod_str' )
 *
-*   @param  : tbl, str mod
+*   @param  : tbl, str modsrc
 *   @param  : bool bString
 *   @return : tbl, str
 */
 
-function base:mats_index( mod, bPath )
+function base:mats_index( modsrc, bPath )
     local suffix = ''
-    if mod then
-        if isstring( mod ) and self.modules[ mod ] and self.modules[ mod ].id then
-            suffix = self.modules[ mod ].id
-        elseif istable( mod ) and mod.id then
-            suffix = mod.id
+    if modsrc then
+        if isstring( modsrc ) and self.modules[ modsrc ] and self.modules[ modsrc ].id then
+            suffix = self.modules[ modsrc ].id
+        elseif istable( modsrc ) and modsrc.id then
+            suffix = modsrc.id
         end
     end
 
-    if isstring( mod ) and not suffix or suffix == '' then
-        suffix = mod
+    if isstring( modsrc ) and not suffix or suffix == '' then
+        suffix = modsrc
     end
 
     suffix = suffix and suffix:lower( )
 
-    if not mod then
+    if not modsrc then
         return rlib.m
     end
 

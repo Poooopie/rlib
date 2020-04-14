@@ -1,11 +1,10 @@
 /*
-*   @package        rlib
-*   @author         Richard [http://steamcommunity.com/profiles/76561198135875727]
-*   @copyright      (C) 2018 - 2020
-*   @since          3.0.0
-*   @website        https://rlib.io
-*   @docs           https://docs.rlib.io
-*   @file           define.lua
+*   @package        : rlib
+*   @author         : Richard [http://steamcommunity.com/profiles/76561198135875727]
+*   @copyright      : (C) 2020 - 2020
+*   @since          : 3.0.0
+*   @website        : https://rlib.io
+*   @docs           : https://docs.rlib.io
 * 
 *   MIT License
 *
@@ -191,9 +190,9 @@ local pf                = mf.prefix
 *   cvar theme ignores
 *
 *   list of data types to ignore
-*   typically used in combination with rlib.cvar:setup
+*   typically used in combination with rlib.v:Setup
 *
-*   @assoc  : rlib_cl :: rlib.cvar:setup( )
+*   @assoc  : rlib_cl :: rlib.v:Setup( )
 *    
 */
 

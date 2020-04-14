@@ -1,11 +1,10 @@
 /*
-*   @package        rlib
-*   @author         Richard [http://steamcommunity.com/profiles/76561198135875727]
-*   @copyright      (C) 2018 - 2020
-*   @since          3.0.0
-*   @website        https://rlib.io
-*   @docs           https://docs.rlib.io
-*   @file           get.lua
+*   @package        : rlib
+*   @author         : Richard [http://steamcommunity.com/profiles/76561198135875727]
+*   @copyright      : (C) 2020 - 2020
+*   @since          : 3.0.0
+*   @website        : https://rlib.io
+*   @docs           : https://docs.rlib.io
 * 
 *   MIT License
 *
@@ -24,20 +23,13 @@ rlib                    = rlib or { }
 local base              = rlib
 local mf                = base.manifest
 local prefix            = mf.prefix
+local cfg               = base.settings
 
 /*
 *   localized rlib routes
 */
 
-local cfg               = base.settings
 local helper            = base.h
-local storage           = base.s
-local utils             = base.u
-local access            = base.a
-local tools             = base.t
-local konsole           = base.k
-local sys               = base.sys
-local resources         = base.resources
 
 /*
 *   Localized lua funcs
@@ -49,11 +41,8 @@ local resources         = base.resources
 local pairs             = pairs
 local GetConVar         = GetConVar
 local tonumber          = tonumber
-local tostring          = tostring
 local IsValid           = IsValid
 local istable           = istable
-local isfunction        = isfunction
-local isentity          = isentity
 local isnumber          = isnumber
 local isstring          = isstring
 local type              = type
@@ -72,27 +61,10 @@ local function lang( ... )
 end
 
 /*
-*	prefix :: create id
+*   simplifiy funcs
 */
 
-local function cid( id, suffix )
-    local affix = istable( suffix ) and suffix.id or isstring( suffix ) and suffix or prefix
-    affix = affix:sub( -1 ) ~= '.' and string.format( '%s.', affix ) or affix
-
-    id = isstring( id ) and id or 'noname'
-    id = id:gsub( '[%c%s]', '.' )
-
-    return string.format( '%s%s', affix, id )
-end
-
-/*
-*	prefix ids
-*/
-
-local function pid( str, suffix )
-    local state = ( isstring( suffix ) and suffix ) or ( base and prefix ) or false
-    return cid( str, state )
-end
+local function log( ... ) base:log( ... ) end
 
 /*
 *   get :: workshops
@@ -152,18 +124,20 @@ end
 *
 *   returns the current running version of a specified manifest in human readable format
 *
-*   @since  : v1.1.5
+*   @param  : tbl mnfst
+*   @param  : str char
 *   @return : str
 */
 
-    function base.get:ver2str_mf( mnfst )
-        mnfst = ( isstring( mnfst ) or istable( mnfst ) and mnfst ) or mf
+    function base.get:ver2str_mf( mnfst, char )
+        mnfst   = ( isstring( mnfst ) or istable( mnfst ) and mnfst ) or mf
+        char    = isstring( char ) and char or '.'
 
         if isstring( mnfst.version ) then
             return mnfst.version
         elseif istable( mnfst.version ) then
             local major, minor, patch = mnfst.version.major or mnfst.version[ 1 ] or 1, mnfst.version.minor or mnfst.version[ 2 ] or 0, mnfst.version.patch or mnfst.version[ 3 ] or 0
-            return sf( '%i.%i.%i', major, minor, patch )
+            return sf( '%i%s%i%s%i', major, char, minor, char, patch )
         end
 
         return '1.0.0'
@@ -254,11 +228,25 @@ end
 *
 *   return the server hostname
 *
+*   @param  : bool bClean
+*   @param  : bool bLower
 *   @return : str
 */
 
-    function base.get:host( )
-        return GetHostName( ) or lang( 'sys_host_untitled' )
+    function base.get:host( bClean, bLower )
+        local host = GetHostName( )
+
+        if bClean then
+            host = host:gsub( '[^%w ]', '' )    -- replace all special chars
+            host = host:gsub( '[%s]', '_' )     -- replace all spaces
+            host = host:gsub( '%_%_+', '_' )    -- replace repeating underscores
+        end
+
+        if bLower then
+            host = host:lower( )
+        end
+
+        return host or lang( 'sys_host_untitled' )
     end
 
 /*
@@ -279,11 +267,12 @@ end
 *   return the server gamemode
 *
 *   @param  : bool bCombine
-*   @param  : bool bLowercase
+*   @param  : bool bLower
+*   @param  : bool bClean
 *   @return : str, str
 */
 
-    function base.get:gm( bCombine, bLowercase )
+    function base.get:gm( bCombine, bLower, bClean )
         local gm_name = ( GM or GAMEMODE ).Name or lang( 'sys_gm_unknown' )
         local gm_base = ( GM or GAMEMODE ).BaseClass.Name or lang( 'sys_gm_sandbox' )
 
@@ -292,10 +281,13 @@ end
 
         if bCombine then
             gm_name = sf( '%s [ %s ]', gm_name, gm_base )
-            return gm_name
         end
 
-        return bLowercase and gm_name:lower( ) or gm_name, bLowercase and gm_base:lower( ) or gm_base
+        if bClean then
+            gm_name = gm_name:gsub( '[%p%c%s]', '_' )
+        end
+
+        return bLower and gm_name:lower( ) or gm_name, bLower and gm_base:lower( ) or gm_base
     end
 
 /*
@@ -307,13 +299,13 @@ end
 */
 
     function base.get:hash( )
-        local ip, port = self:getaddr( )
+        local ip, port = self:addr( )
         if not ip then return end
-        port = port or '27015'
 
-        local checksum = util.CRC( ip .. port )
+        port        = port or '27015'
+        local cs    = util.CRC( sf( '%s:%s', ip, port ) )
 
-        return sf( '%x', checksum )
+        return sf( '%x', cs )
     end
 
 /*
@@ -321,24 +313,30 @@ end
 *
 *   return server ip
 *
+*           :   char
+*               if bool and true; will replace separate segments with |
+*               if str provided, that will be used as separator
+*
+*   @usage  : base.get:ip( '-' )
+*             returns 127-0-0-1
+*
+*           : base.get:ip( true )
+*             returns 127|0|0|1
+*
+*           : base.get:ip( )
+*             returns 127.0.0.1
+*
+*   @param  : str, bool char
 *   @return : str
 */
 
-    function base.get:ip( )
-        local hostip    = GetConVar( 'hostip' ):GetString( )
-        hostip          = tonumber( hostip )
-        if isnumber( hostip ) then
-            local ip    = { }
-            ip[ 1 ]     = bit.rshift( bit.band( hostip, 0xFF000000 ), 24 )
-            ip[ 2 ]     = bit.rshift( bit.band( hostip, 0x00FF0000 ), 16 )
-            ip[ 3 ]     = bit.rshift( bit.band( hostip, 0x0000FF00 ), 8 )
-            ip[ 4 ]     = bit.band( hostip, 0x000000FF )
-            return table.concat( ip, '.' )
-        else
-            hostip      = game.GetIPAddress( )
-            local e     = string.Explode( ':', hostip )
-            return e[ 1 ]
-        end
+    function base.get:ip( char )
+        local ip    = game.GetIPAddress( )
+        local e     = string.Explode( ':', ip )
+        sep         = ( isstring( char ) and char ) or ( isbool( char ) and char == true and '|' ) or '.'
+        local resp  = e[ 1 ]:gsub( '[%p]', sep )
+
+        return resp
     end
 
 /*
@@ -350,15 +348,15 @@ end
 */
 
     function base.get:port( )
-        local hostport = GetConVar( 'hostport' ):GetInt( )
-        if hostport and hostport ~= 0 then
-            return hostport
+        local port = GetConVar( 'hostport' ):GetInt( )
+        if port and port ~= 0 then
+            return port
         else
             local ip    = game.GetIPAddress( )
             local e     = string.Explode( ':', ip )
-            hostport    = e[ 2 ]
+            port        = e[ 2 ]
 
-            return hostport
+            return port
         end
     end
 
@@ -411,7 +409,7 @@ end
         source = source or base.plugins or { }
 
         if not istable( source ) then
-            base:log( 2, 'missing table for » [ %s ]', debug.getinfo( 1, 'n' ).name )
+            log( 2, 'missing table for » [ %s ]', debug.getinfo( 1, 'n' ).name )
             return false
         end
 
@@ -422,9 +420,9 @@ end
                     table.insert( base.o, v.manifest.owner )
                 end
             elseif type( v.manifest.owner ) == 'table' then
-                for t, ply in pairs( v.manifest.owner ) do
-                    if helper.ok.sid64( ply ) and not table.HasValue( base.o, ply ) then
-                        table.insert( base.o, ply )
+                for t, pl in pairs( v.manifest.owner ) do
+                    if helper.ok.sid64( pl ) and not table.HasValue( base.o, pl ) then
+                        table.insert( base.o, pl )
                     end
                 end
             end

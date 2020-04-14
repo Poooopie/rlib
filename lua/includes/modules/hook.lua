@@ -1,10 +1,11 @@
 /*
-*   @package        rlib
-*   @author         Richard [http://steamcommunity.com/profiles/76561198135875727]
-*   @copyright      (C) 2020 - 2020
-*   @since          3.0.0
-*   @website        https://rlib.io
-*   @docs           https://docs.rlib.io
+*   @package        : rlib
+*   @module         : hook
+*   @author         : Richard [http://steamcommunity.com/profiles/76561198135875727]
+*   @copyright      : (C) 2020 - 2020
+*   @since          : 3.0.0
+*   @website        : https://rlib.io
+*   @docs           : https://docs.rlib.io
 * 
 *   MIT License
 *
@@ -16,10 +17,10 @@
 */
 
 /*
-*   @package        srlion's hook library
-*   @author         Richard [http://steamcommunity.com/profiles/76561198261855442]
-*   @copyright      (C) 2019 - 2020
-*   @website        https://github.com/Srlion/Hook-Library/tree/master
+*   @package        : srlion's hook library
+*   @author         : Richard [http://steamcommunity.com/profiles/76561198261855442]
+*   @copyright      : (C) 2019 - 2020
+*   @website        : https://github.com/Srlion/Hook-Library/tree/master
 *
 *   MIT License
 *

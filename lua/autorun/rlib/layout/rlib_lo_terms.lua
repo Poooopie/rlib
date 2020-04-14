@@ -2,7 +2,7 @@
 *   @package        : rlib
 *   @author         : Richard [http://steamcommunity.com/profiles/76561198135875727]
 *   @copyright      : (C) 2018 - 2020
-*   @since          : 1.0.0
+*   @since          : 3.0.0
 *   @website        : https://rlib.io
 *   @docs           : https://docs.rlib.io
 * 
@@ -43,16 +43,6 @@ local function pref( str, suffix )
     local state = ( isstring( suffix ) and suffix ) or ( base and mf.prefix ) or false
     return rlib.get:pref( str, state )
 end
-
-/*
-*   netlib
-*/
-
-local function netlib_udm_check( )
-    mf.astra.oort.validated     = net.ReadBool( )
-    mf.astra.oort.has_latest    = net.ReadBool( )
-end
-net.Receive( 'rlib.udm.check', netlib_udm_check )
 
 /*
 *   panel
@@ -368,49 +358,6 @@ function PANEL:Init( )
                                     end
                                 end )
 
-    /*
-    *   update timer
-    *
-    *   checks the current version of rlib installed with the latest version to determine
-    *   if updates are needed
-    */
-
-    timex.create( 'rlib_udm_check', 30, 1, function( )
-
-        /*
-        *   network update check
-        */
-
-        net.Start           ( 'rlib.udm.check' )
-        net.SendToServer    ( )
-
-        rlib:log( 6, lang( 'lib_udm_timer_ran' ) )
-
-    end )
-
-    /*
-    *   initialize timer
-    */
-
-    timex.simple( 'rlib_about_run', 3, function( )
-        if not ui:valid( self ) then return end
-        if not mf.astra.oort.has_latest then
-            ui:show( self.p_status )
-            self.l_status:SetText   ( lang( 'lib_udm_outdated' ) )
-        else
-            self.l_status:SetText   ( lang( 'lib_udm_latest' ) )
-            clr_box_status          = Color( 50, 80, 50, 255 )
-        end
-
-        if mf.astra.oort.validated then
-            self.conn_status        = lang( 'lib_oort_abt_status_ok' )
-            self.conn_clr           = Color( 0, 134, 51, 255 )
-            return
-        end
-
-        self.conn_status            = lang( 'lib_oort_abt_status_err' )
-    end )
-
 end
 
 /*
@@ -571,7 +518,6 @@ end
 */
 
 function PANEL:Destroy( )
-    timex.expire( 'rlib_udm_check' )
     ui:destroy( self, true, true )
 end
 
@@ -593,4 +539,4 @@ end
 *   register
 */
 
-vgui.Register( 'rlib.lo.about', PANEL, 'DFrame' )
+vgui.Register( 'rlib.lo.terms', PANEL, 'DFrame' )

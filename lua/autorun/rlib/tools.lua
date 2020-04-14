@@ -1,11 +1,10 @@
 /*
-*   @package        rlib
-*   @author         Richard [http://steamcommunity.com/profiles/76561198135875727]
-*   @copyright      (C) 2018 - 2020
-*   @since          1.0.0
-*   @website        https://rlib.io
-*   @docs           https://docs.rlib.io
-*   @file           tools.lua
+*   @package        : rlib
+*   @author         : Richard [http://steamcommunity.com/profiles/76561198135875727]
+*   @copyright      : (C) 2018 - 2020
+*   @since          : 1.0.0
+*   @website        : https://rlib.io
+*   @docs           : https://docs.rlib.io
 * 
 *   MIT License
 *
@@ -37,7 +36,6 @@ local ui                    = base.i
 local mats                  = base.m
 local tools                 = base.t
 local konsole               = base.k
-local utils                 = base.u
 
 /*
 *   Localized translation func
@@ -141,9 +139,28 @@ function tools.pco:Run( bEnable )
     bEnable = bEnable or false
 
     for k, v in pairs( helper._pco_cvars ) do
-        local val = v.val or ( bEnable and 1 ) or 0
+        local val = ( bEnable and ( v.on or 1 ) ) or ( v.off or 0 )
         rcc.run.gmod( v.id, val )
     end
+
+    if cfg.pco.hooks then
+        for k, v in pairs( helper._pco_hooks ) do
+            if bEnable then
+                hook.Remove( v.event, v.name )
+            else
+                hook.Add( v.event, v.name )
+            end
+        end
+    end
+
+    hook.Add( 'OnEntityCreated', 'rlib_widget_entcreated', function( ent )
+        if ent:IsWidget( ) then
+            hook.Add( 'PlayerTick', 'rlib_widget_tick', function( pl, mv )
+                widgets.PlayerTick( pl, mv )
+            end )
+            hook.Remove( 'OnEntityCreated', 'rlib_widget_entcreated' )
+        end
+    end )
 end
 
 /*
@@ -318,7 +335,11 @@ net.Receive( 'rlib.tools.rmain', netlib_tools_rmain )
 
 local i_konsole_think = 0
 local function th_binds_konsole( )
-    if not access:bIsDev( LocalPlayer( ) ) and not access:bIsAdmin( LocalPlayer( ) ) then return end
+    if not access:bIsDev( LocalPlayer( ) ) and not access:bIsAdmin( LocalPlayer( ) ) then
+        hook.Remove( 'Think', pid( 'keybinds.konsole' ) )
+        return
+    end
+
     if gui.IsConsoleVisible( ) then return end
 
     local iKey1, iKey2      = cfg.konsole.binds.act_btn1, cfg.konsole.binds.act_btn2
@@ -350,7 +371,11 @@ hook.Add( 'Think', pid( 'keybinds.konsole' ), th_binds_konsole )
 
 local i_rep_think = 0
 local function th_binds_report( )
-    if not access:bIsDev( LocalPlayer( ) ) and not access:bIsRoot( LocalPlayer( ) ) then return end
+    if not access:bIsDev( LocalPlayer( ) ) and not access:bIsRoot( LocalPlayer( ) ) then
+        hook.Remove( 'Think', pid( 'keybinds.report' ) )
+        return
+    end
+
     if gui.IsConsoleVisible( ) then return end
 
     local iKey1, iKey2      = cfg.report.binds.key1, cfg.report.binds.key2
@@ -382,7 +407,11 @@ hook.Add( 'Think', pid( 'keybinds.report' ), th_binds_report )
 
 local i_rmain_think = 0
 local function th_binds_rmain( )
-    if not access:bIsDev( LocalPlayer( ) ) and not access:bIsRoot( LocalPlayer( ) ) then return end
+    if not access:bIsDev( LocalPlayer( ) ) and not access:bIsRoot( LocalPlayer( ) ) then
+        hook.Remove( 'Think', pid( 'keybinds.rmain' ) )
+        return
+    end
+
     if gui.IsConsoleVisible( ) then return end
 
     local iKey1, iKey2      = cfg.rmain.binds.key1, cfg.rmain.binds.key2
@@ -414,7 +443,11 @@ hook.Add( 'Think', pid( 'keybinds.rmain' ), th_binds_rmain )
 
 local i_rcfg_think = 0
 local function th_binds_rcfg( )
-    if not access:bIsDev( LocalPlayer( ) ) and not access:bIsRoot( LocalPlayer( ) ) then return end
+    if not access:bIsDev( LocalPlayer( ) ) and not access:bIsRoot( LocalPlayer( ) ) then
+        hook.Remove( 'Think', pid( 'keybinds.rcfg' ) )
+        return
+    end
+
     if gui.IsConsoleVisible( ) then return end
     if not cfg.rcfg.binds.enabled then return end
 

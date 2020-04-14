@@ -1,10 +1,11 @@
 /*
-*   @package        rlib
-*   @author         Richard [http://steamcommunity.com/profiles/76561198135875727]
-*   @copyright      (C) 2018 - 2020
-*   @since          3.0.0
-*   @website        https://rlib.io
-*   @docs           https://docs.rlib.io
+*   @package        : rlib
+*   @module         : rhook
+*   @author         : Richard [http://steamcommunity.com/profiles/76561198135875727]
+*   @copyright      : (C) 2020 - 2020
+*   @since          : 3.0.0
+*   @website        : https://rlib.io
+*   @docs           : https://docs.rlib.io
 * 
 *   MIT License
 *
@@ -25,42 +26,34 @@ local mf                = base.manifest
 local prefix            = mf.prefix
 
 /*
-*   pkg declarations
+*   lib includes
 */
 
-local manifest =
-{
-    author          = 'richard',
-    desc            = 'hook management',
-    build           = 032620,
-    version         = { 2, 0, 0 },
-    debug_id        = 'rhook.debug.delay',
-}
+local access            = base.a
+local helper            = base.h
 
 /*
 *   module declarations
 */
 
-local dcat          = 9
+local dcat              = 9
 
 /*
 *   localizations
 */
 
-local math          = math
-local module        = module
-local sf            = string.format
-local isstring      = isstring
-local istable       = istable
-local isfunction    = isfunction
+local module            = module
+local isstring          = isstring
+local istable           = istable
+local isfunction        = isfunction
+local sf                = string.format
 
 /*
-*   Localized translation func
+*   simplifiy funcs
 */
 
-local function lang( ... )
-    return base:lang( ... )
-end
+local function con( ... ) base:console( ... ) end
+local function log( ... ) base:log( ... ) end
 
 /*
 *   call id
@@ -81,8 +74,8 @@ local function pref( id, suffix )
     local affix     = istable( suffix ) and suffix.id or isstring( suffix ) and suffix or prefix
     affix           = affix:sub( -1 ) ~= '.' and sf( '%s.', affix ) or affix
 
-    id = isstring( id ) and id or 'noname'
-    id = id:gsub( '[%c%s]', '.' )
+    id              = isstring( id ) and id or 'noname'
+    id              = id:gsub( '[%c%s]', '.' )
 
     return sf( '%s%s', affix, id )
 end
@@ -110,6 +103,19 @@ local pkg           = rhook
 local pkg_name      = _NAME or 'rhook'
 
 /*
+*   pkg declarations
+*/
+
+local manifest =
+{
+    author          = 'richard',
+    desc            = 'hook management',
+    build           = 032620,
+    version         = { 2, 0, 0 },
+    debug_id        = 'rhook.debug.delay',
+}
+
+/*
 *   required tables
 */
 
@@ -135,22 +141,14 @@ cfg.debug           = cfg.debug or false
 local function gid( id )
     id = isstring( id ) and id or nil
     if not isstring( id ) then
-        local trcback = debug.traceback( )
-        base:log( dcat, '[ %s ] :: invalid id\n%s', pkg_name, tostring( trcback ) )
+        local tb = debug.traceback( )
+        log( dcat, '[ %s ] :: invalid id\n%s', pkg_name, tostring( tb ) )
         return
     end
 
-    id          = call_id( id )
+    id = call_id( id )
 
     return id
-end
-
-/*
-*   module info :: manifest
-*/
-
-function pkg:manifest( )
-    return self.__manifest
 end
 
 /*
@@ -180,14 +178,14 @@ function new.rlib( event, ... )
     end
 
     if not isfunction( fn ) then
-        base:log( dcat, '[ %s ] :: invalid func\n%s', pkg_name, tostring( trcback ) )
+        log( dcat, '[ %s ] :: invalid func\n%s', pkg_name, tostring( trcback ) )
         return
     end
 
     if cfg.debug then
-        print( event )
-        print( id )
-        print( '\n\n' )
+        con( nil, event )
+        con( nil, id )
+        con( nil, 0 )
     end
 
     hook.Add( event, id, fn )
@@ -292,13 +290,79 @@ function call.gmod( event, ... )
 end
 
 /*
-*   register :: commands
+*   rcc :: base command
+*
+*   base package command
+*/
+
+function rcc.call:RHook( pl, cmd, args )
+
+    /*
+    *   permissions
+    */
+
+    local ccmd = base.calls:get( 'commands', 'rhook' )
+
+    if ( ccmd.scope == 1 and not base.con:Is( pl ) ) then
+        access:deny_consoleonly( pl, script, ccmd.id )
+        return
+    end
+
+    if not access:bIsRoot( pl ) then
+        access:deny_permission( pl, script, ccmd.id )
+        return
+    end
+
+    /*
+    *   output
+    */
+
+    con( pl, 1 )
+    con( pl, 0 )
+    con( pl, Color( 255, 255, 0 ), sf( 'Manifest » %s', pkg_name ) )
+    con( pl, 0 )
+    con( pl, manifest.desc )
+    con( pl, 1 )
+
+    local a1_l              = sf( '%-20s',  'Version'   )
+    local a2_l              = sf( '%-5s',  '»'   )
+    local a3_l              = sf( '%-35s',  sf( 'v%s build-%s', rlib.get:ver2str( manifest.version ), manifest.build )   )
+
+    con( pl, Color( 255, 255, 0 ), a1_l, Color( 255, 255, 255 ), a2_l, a3_l )
+
+    local b1_l              = sf( '%-20s',  'Author'    )
+    local b2_l              = sf( '%-5s',  '»'          )
+    local b3_l              = sf( '%-35s',  sf( '%s', manifest.author ) )
+
+    con( pl, Color( 255, 255, 0 ), b1_l, Color( 255, 255, 255 ), b2_l, b3_l )
+
+    con( pl, 2 )
+
+end
+
+/*
+*   register new commands
 */
 
 local function register_commands( )
-    local pkg_commands = { }
+    local pkg_commands =
+    {
+        [ pkg_name ] =
+        {
+            enabled     = true,
+            warn        = true,
+            id          = pkg_name,
+            name        = pkg_name,
+            desc        = 'returns package information',
+            scope       = 2,
+            clr         = Color( 255, 255, 0 ),
+            assoc = function( ... )
+                rcc.call:RHook( ... )
+            end,
+        },
+    }
 
-    base.calls:register_cmds( pkg_commands )
+    base.calls.commands:Register( pkg_commands )
 end
 hook.Add( pid( 'cmd.register' ), pid( '__rhook.cmd.register' ), register_commands )
 
@@ -308,9 +372,17 @@ hook.Add( pid( 'cmd.register' ), pid( '__rhook.cmd.register' ), register_command
 
 local function register_pkg( )
     if not istable( _M ) then return end
-    base.pkgs:register( _M )
+    base.package:Register( _M )
 end
 hook.Add( pid( 'pkg.register' ), pid( '__rhook.pkg.register' ), register_pkg )
+
+/*
+*   module info :: manifest
+*/
+
+function pkg:manifest( )
+    return self.__manifest
+end
 
 /*
 *   __tostring

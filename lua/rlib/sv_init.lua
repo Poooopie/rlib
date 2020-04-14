@@ -119,9 +119,11 @@ function base:modules_writedata( )
     local mdata     = { }
     mdata.modules   = { }
     for k, v in pairs( base.modules ) do
+        local ver   = ( istable( v.version ) and rlib.modules:ver2str( v.version ) ) or v.version
+
         mdata.modules[ k ]          = { }
         mdata.modules[ k ].name     = v.name
-        mdata.modules[ k ].version  = v.version
+        mdata.modules[ k ].version  = ver
         mdata.modules[ k ].enabled  = v.enabled
     end
     table.sort( mdata, function( a, b ) return a[ 1 ] < b[ 1 ] end )
@@ -205,11 +207,13 @@ function base:module_validate( source, bBypass )
             local mod_sys       = istable( v.parent.sys ) and v.parent.sys or { }
             mod_sys.validate    = true
 
+            /*
             if ( v.script_id or v.sid ) and v.owner then
-                rlib.oort:Run( v )
+                rlib.oort:Gmodstore( v )
             end
 
             rlib.udm:scriptdb( v )
+            */
 
             /*
             *   check each module's libreq version to see if rlib is updated to run properly

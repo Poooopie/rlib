@@ -1,11 +1,10 @@
 /*
-*   @package        rlib
-*   @author         Richard [http://steamcommunity.com/profiles/76561198135875727]
-*   @copyright      (C) 2018 - 2020
-*   @since          2.2.0
-*   @website        https://rlib.io
-*   @docs           https://docs.rlib.io
-*   @file           pmeta.lua
+*   @package        : rlib
+*   @author         : Richard [http://steamcommunity.com/profiles/76561198135875727]
+*   @copyright      : (C) 2019 - 2020
+*   @since          : 2.2.0
+*   @website        : https://rlib.io
+*   @docs           : https://docs.rlib.io
 * 
 *   MIT License
 *
@@ -120,6 +119,22 @@ function pmeta:palias( override )
 end
 
 /*
+*	pmeta :: player model :: revision 2
+*
+*   a fix for certain models displaying /models/models/
+*
+*   @return : tbl, str
+*/
+
+function pmeta:getmdl_rev2( )
+    if self:GetModel( ):sub( 1, 13 ) == 'models/models' then
+        return self:GetModel( ):sub( 8 )
+    else
+        return self:GetModel( )
+    end
+end
+
+/*
 *	pmeta :: player model :: get
 *
 *   returns the current model for the job of a player
@@ -136,11 +151,11 @@ function pmeta:getmdl( bCurrent )
         result = istable( mdl ) and mdl[ 1 ] or mdl
         util.PrecacheModel( result )
     else
-        result = self:GetModel( )
+        result = self:getmdl_rev2( )
     end
 
     if bCurrent then
-        result = self:GetModel( )
+        result = self:getmdl_rev2( )
     end
 
     return result

@@ -134,8 +134,8 @@
             id          = 'module.cmd',
             desc        = 'demo command example',
             scope       = 1,
-            assoc = function( ply, cmd, args, str )
-                module.cc_demo( ply, cmd, args, str )
+            assoc = function( ... )
+                module.cc_demo( ... )
             end,
         },
     }

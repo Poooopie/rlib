@@ -1,10 +1,11 @@
 /*
-*   @package        rlib
-*   @author         Richard [http://steamcommunity.com/profiles/76561198135875727]
-*   @copyright      (C) 2018 - 2020
-*   @since          1.1.0
-*   @website        https://rlib.io
-*   @docs           https://docs.rlib.io
+*   @package        : rlib
+*   @module         : calc
+*   @author         : Richard [http://steamcommunity.com/profiles/76561198135875727]
+*   @copyright      : (C) 2018 - 2020
+*   @since          : 1.0.0
+*   @website        : https://rlib.io
+*   @docs           : https://docs.rlib.io
 * 
 *   MIT License
 *
@@ -31,30 +32,46 @@ local settings          = base.settings
 */
 
 local access            = base.a
-local utils             = base.u
 local helper            = base.h
-
-/*
-*   pkg declarations
-*/
-
-local manifest =
-{
-    author      = 'richard',
-    desc        = 'calculations',
-    build       = 032620,
-    version     = { 2, 0, 0 },
-}
 
 /*
 *   localizations
 */
 
-local timer             = timer
 local math              = math
-local debug             = debug
 local module            = module
+local smt               = setmetatable
 local sf                = string.format
+
+/*
+*   simplifiy funcs
+*/
+
+local function con( ... ) base:console( ... ) end
+local function log( ... ) base:log( ... ) end
+
+/*
+*	prefix :: create id
+*/
+
+local function pref( id, suffix )
+    local affix = istable( suffix ) and suffix.id or isstring( suffix ) and suffix or prefix
+    affix       = affix:sub( -1 ) ~= '.' and sf( '%s.', affix ) or affix
+
+    id          = isstring( id ) and id or 'noname'
+    id          = id:gsub( '[%c%s]', '.' )
+
+    return sf( '%s%s', affix, id )
+end
+
+/*
+*	prefix :: handle
+*/
+
+local function pid( str, suffix )
+    local state = ( isstring( suffix ) and suffix ) or ( base and mf.prefix ) or false
+    return pref( str, state )
+end
 
 /*
 *   define module
@@ -68,6 +85,18 @@ module( 'calc', package.seeall )
 
 local pkg           = calc
 local pkg_name      = _NAME or 'calc'
+
+/*
+*   pkg declarations
+*/
+
+local manifest =
+{
+    author          = 'richard',
+    desc            = 'mathmatical calculations related to time, memory, data counts, etc',
+    build           = 040220,
+    version         = { 2, 1, 0 },
+}
 
 /*
 *   required tables
@@ -330,8 +359,8 @@ function xp_percent( ply, multiplier )
     local xp_calc           = 0
     local output            = 0
     if LevelSystemConfiguration then
-        local xp_percent    = ( ( pl_xp or 0 ) / ( ( ( 10 + ( ( ( pl_level or 1 ) * ( ( pl_level or 1 ) + 1 ) * 90 ) ) ) ) * ( ( isnumber( multiplier ) and multiplier ) or LevelSystemConfiguration.XPMult or 1.0 ) ) ) or 0
-        xp_calc             = xp_percent * 100 or 0
+        local xp_perc       = ( ( pl_xp or 0 ) / ( ( ( 10 + ( ( ( pl_level or 1 ) * ( ( pl_level or 1 ) + 1 ) * 90 ) ) ) ) * ( ( isnumber( multiplier ) and multiplier ) or LevelSystemConfiguration.XPMult or 1.0 ) ) ) or 0
+        xp_calc             = xp_perc * 100 or 0
         xp_calc             = math.Round( xp_calc ) or 0
         xp_format           = math.Clamp( xp_calc, 0, 99 )
         output              = xp_format or 0
@@ -541,12 +570,39 @@ function hex2int( hex )
 end
 
 /*
-*   concommand :: base command
+*   calc :: equation
+*
+*   chain mathmatics
+*
+*   @ex     : calc:equation( 10 ):add( 5 ):sub( 3 ):mul( 2 ):result( )
+*
+*   @return : int
+*/
+
+local equations =
+{
+    __index =
+    {
+        add     = function( s, num ) s._r = s._r + num return s end,
+        sub     = function( s, num ) s._r = s._r - num return s end,
+        mul     = function( s, num ) s._r = s._r * num return s end,
+        div     = function( s, num ) s._r = s._r / num return s end,
+        result  = function( s) return s._r end
+} }
+
+equation = function( s, num )
+return smt(
+{
+    _r = num or 0
+}, equations ) end
+
+/*
+*   rcc :: base command
 *
 *   base package command
 */
 
-function utils.cc_calc( ply, cmd, args )
+function rcc.call:Calc( ply, cmd, args )
 
     /*
     *   permissions
@@ -565,13 +621,29 @@ function utils.cc_calc( ply, cmd, args )
     end
 
     /*
-    *   functionality
+    *   output
     */
 
-    base.msg:route( ply, false, pkg_name, script .. ' package' )
-    base.msg:route( ply, false, pkg_name, 'v' .. manifest.version .. ' build-' .. manifest.build )
-    base.msg:route( ply, false, pkg_name, 'developed by ' .. manifest.author )
-    base.msg:route( ply, false, pkg_name, manifest.desc .. '\n' )
+    con( pl, 1 )
+    con( pl, 0 )
+    con( pl, Color( 255, 255, 0 ), sf( 'Manifest » %s', pkg_name ) )
+    con( pl, 0 )
+    con( pl, manifest.desc )
+    con( pl, 1 )
+
+    local a1_l              = sf( '%-20s',  'Version'   )
+    local a2_l              = sf( '%-5s',  '»'   )
+    local a3_l              = sf( '%-35s',  sf( 'v%s build-%s', rlib.get:ver2str( manifest.version ), manifest.build )   )
+
+    con( pl, Color( 255, 255, 0 ), a1_l, Color( 255, 255, 255 ), a2_l, a3_l )
+
+    local b1_l              = sf( '%-20s',  'Author'    )
+    local b2_l              = sf( '%-5s',  '»'          )
+    local b3_l              = sf( '%-35s',  sf( '%s', manifest.author ) )
+
+    con( pl, Color( 255, 255, 0 ), b1_l, Color( 255, 255, 255 ), b2_l, b3_l )
+
+    con( pl, 2 )
 
 end
 
@@ -591,15 +663,15 @@ local function register_commands( )
             desc        = 'returns package information',
             scope       = 2,
             clr         = Color( 255, 255, 0 ),
-            assoc = function( ply, cmd, args, str )
-                rlib.u.cc_calc( ply, cmd, args, str )
+            assoc = function( ... )
+                rcc.call:Calc( ... )
             end,
         },
     }
 
-    base.calls:register_cmds( pkg_commands )
+    base.calls.commands:Register( pkg_commands )
 end
-hook.Add( prefix .. 'cmd.register', prefix .. '__calc.cmd.register', register_commands )
+hook.Add( pid( 'cmd.register' ), pid( '__calc.cmd.register' ), register_commands )
 
 /*
 *   register package
@@ -607,9 +679,9 @@ hook.Add( prefix .. 'cmd.register', prefix .. '__calc.cmd.register', register_co
 
 local function register_pkg( )
     if not istable( _M ) then return end
-    base.pkgs:register( _M )
+    base.package:Register( _M )
 end
-hook.Add( prefix .. 'pkg.register', prefix .. '__calc.pkg.register', register_pkg )
+hook.Add( pid( 'pkg.register' ), pid( '__calc.pkg.register' ), register_pkg )
 
 /*
 *   module info :: manifest
@@ -634,7 +706,7 @@ end
 function pkg:new( class )
     class = class or { }
     self.__index = self
-    return setmetatable( class, self )
+    return smt( class, self )
 end
 
 /*

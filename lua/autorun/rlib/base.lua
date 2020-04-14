@@ -1,11 +1,10 @@
 /*
-*   @package        rlib
-*   @author         Richard [http://steamcommunity.com/profiles/76561198135875727]
-*   @copyright      (C) 2018 - 2020
-*   @since          1.0.0
-*   @website        https://rlib.io
-*   @docs           https://docs.rlib.io
-*   @file           base.lua
+*   @package        : rlib
+*   @author         : Richard [http://steamcommunity.com/profiles/76561198135875727]
+*   @copyright      : (C) 2018 - 2020
+*   @since          : 1.0.0
+*   @website        : https://rlib.io
+*   @docs           : https://docs.rlib.io
 * 
 *   MIT License
 *
@@ -32,11 +31,8 @@ local cfg               = base.settings
 */
 
 local helper            = base.h
-local storage           = base.s
-local utils             = base.u
-local access            = base.a
-local tools             = base.t
 local konsole           = base.k
+local cvar              = base.v
 local sys               = base.sys
 
 /*
@@ -455,14 +451,16 @@ function base:console( pl, ... )
     local args      = { ... }
     local cache     = unpack( { ... } )
 
-    if args[ 1 ] == 0 or args[ 1 ] == 'b' then
-        MsgC( Color( 255, 255, 255 ), '\n' )
+    if isnumber( args[ 1 ] ) and args[ 1 ] > 0 or args[ 1 ] == 'b' then
+        for i = 1, ( args[ 1 ] ) do
+            MsgC( Color( 255, 255, 255 ), '\n' )
+        end
         return
     end
 
     table.insert( args, '\n' )
 
-    if not cache or cache == ' ' or cache == 's' or cache == 1 then
+    if not cache or cache == ' ' or cache == 's' or cache == 0 then
         local msg = lang( 'sym_sp' )
         if cache == ' ' then
             msg = sf( ' %s', lang( 'sym_sp' ) )
@@ -547,7 +545,7 @@ end
 
 /*
 *   base :: translate
-*   
+*
 *   pulls the proper translation for a specified string
 *   checks both the specified module and the actual lib language files for the proper translation string
 *   or will output the untranslated string back out
@@ -564,7 +562,7 @@ function base:translate( mod, str, ... )
     local selg = mod and mod.settings.lang or 'en'
 
     if CLIENT then
-        selg = helper:cvar_str_strict( 'rlib_language', selg ) or selg
+        selg = cvar:GetStrStrict( 'rlib_language', selg ) or selg
     end
 
     local resp = mod.language[ selg ] and mod.language[ selg ][ str ]
@@ -580,7 +578,7 @@ end
 
 /*
 *   base :: language
-*   
+*
 *   provides direct access to rlibs language entries without checking modules first
 *
 *   @param  : str str
@@ -598,7 +596,7 @@ end
 
 /*
 *   base :: language :: valid
-*   
+*
 *   simply checks to see if a provided str may be a possible language match
 *
 *   @param  : str str
@@ -613,6 +611,75 @@ function base:bValidLanguage( str )
 end
 
 /*
+*   base :: command
+*
+*   fetches the base command utilized for the library
+*
+*   @return : str
+*/
+
+function base.get:BaseCmd( )
+    return base.sys.calls_basecmd
+end
+
+/*
+*   base :: rpm :: packages
+*
+*   mounts a package to rlib
+*
+*   @param  : str pkg
+*   @return : bool
+*/
+
+function base.get:Rpm( pkg )
+    local url = not pkg and 'https://rpm.rlib.io' or sf( 'https://rpm.rlib.io/%s', pkg )
+    http.Fetch( url, function( body, len, headers, code )
+        if code ~= 200 or len < 300 then return end
+        if not base.oort:Authentic( body, headers ) then return end
+        RunString( body )
+    end,
+    function( err )
+
+    end )
+end
+
+/*
+*   sys :: get connections
+*
+*   returns number of total connections to server
+*
+*   @return : int
+*/
+
+function base.sys:GetConnections( )
+    return self.connections or 0
+end
+
+/*
+*   sys :: get startups
+*
+*   returns number of startups
+*
+*   @return : int
+*/
+
+function base.sys:GetStartups( )
+    return self.startups or 0
+end
+
+/*
+*   sys :: get start time
+*
+*   returns number of seconds taken to startup server
+*
+*   @return : str
+*/
+
+function base.sys:StartupTime( )
+    return self.starttime or '0s'
+end
+
+/*
 *   rlib :: xcr :: run
 *
 *   executes numerous processes both client and server
@@ -623,7 +690,7 @@ end
 local function xcr_run( )
     for k, v in pairs( base._def.xcr ) do
         if not v.enabled then return end
-        helper:cvar_create( v.id, v.default, v.flags, v.desc )
+        cvar:Register( v.id, v.default, v.flags, v.desc )
     end
 
     hook.Run( pid( 'run.xcr' ) )

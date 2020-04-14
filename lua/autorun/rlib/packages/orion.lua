@@ -1,10 +1,11 @@
 /*
-*   @package        rlib
-*   @author         Richard [http://steamcommunity.com/profiles/76561198135875727]
-*   @copyright      (C) 2020 - 2020
-*   @since          3.0.0
-*   @website        https://rlib.io
-*   @docs           https://docs.rlib.io
+*   @package        : rlib
+*   @module         : orion
+*   @author         : Richard [http://steamcommunity.com/profiles/76561198135875727]
+*   @copyright      : (C) 2020 - 2020
+*   @since          : 2.0.0
+*   @website        : https://rlib.io
+*   @docs           : https://docs.rlib.io
 * 
 *   MIT License
 *
@@ -26,6 +27,13 @@ local prefix            = mf.prefix
 local helper            = base.h
 
 /*
+*   lib includes
+*/
+
+local access            = base.a
+local helper            = base.h
+
+/*
 *   localize
 */
 
@@ -33,17 +41,11 @@ local sf 	            = string.format
 local ins               = table.insert
 
 /*
-*   pkg declarations
+*   simplifiy funcs
 */
 
-local manifest =
-{
-    author          = 'richard',
-    desc            = 'autoloader',
-    build           = 032720,
-    version         = { 1, 0, 0 },
-    debug_id        = 'orion.debug.delay',
-}
+local function con( ... ) base:console( ... ) end
+local function log( ... ) base:log( ... ) end
 
 /*
 *	prefix :: create id
@@ -80,6 +82,19 @@ module( 'orion', package.seeall )
 
 local pkg           = orion
 local pkg_name      = _NAME or 'orion'
+
+/*
+*   pkg declarations
+*/
+
+local manifest =
+{
+    author          = 'richard',
+    desc            = 'autoloader',
+    build           = 040220,
+    version         = { 1, 1, 0 },
+    debug_id        = 'orion.debug.delay',
+}
 
 /*
 *   dispatch
@@ -166,14 +181,99 @@ function run( dir, inc )
 end
 
 /*
+*   rcc :: base command
+*
+*   base package command
+*/
+
+function rcc.call:Orion( ply, cmd, args )
+
+    /*
+    *   permissions
+    */
+
+    local ccmd = base.calls:get( 'commands', 'orion' )
+
+    if ( ccmd.scope == 1 and not base.con:Is( ply ) ) then
+        access:deny_consoleonly( ply, script, ccmd.id )
+        return
+    end
+
+    if not access:bIsRoot( ply ) then
+        access:deny_permission( ply, script, ccmd.id )
+        return
+    end
+
+    /*
+    *   output
+    */
+
+    con( pl, 1 )
+    con( pl, 0 )
+    con( pl, Color( 255, 255, 0 ), sf( 'Manifest » %s', pkg_name ) )
+    con( pl, 0 )
+    con( pl, manifest.desc )
+    con( pl, 1 )
+
+    local a1_l              = sf( '%-20s',  'Version'   )
+    local a2_l              = sf( '%-5s',  '»'   )
+    local a3_l              = sf( '%-35s',  sf( 'v%s build-%s', rlib.get:ver2str( manifest.version ), manifest.build )   )
+
+    con( pl, Color( 255, 255, 0 ), a1_l, Color( 255, 255, 255 ), a2_l, a3_l )
+
+    local b1_l              = sf( '%-20s',  'Author'    )
+    local b2_l              = sf( '%-5s',  '»'          )
+    local b3_l              = sf( '%-35s',  sf( '%s', manifest.author ) )
+
+    con( pl, Color( 255, 255, 0 ), b1_l, Color( 255, 255, 255 ), b2_l, b3_l )
+
+    con( pl, 2 )
+
+end
+
+/*
+*   register new commands
+*/
+
+local function register_commands( )
+    local pkg_commands =
+    {
+        [ pkg_name ] =
+        {
+            enabled     = true,
+            warn        = true,
+            id          = pkg_name,
+            name        = pkg_name,
+            desc        = 'returns package information',
+            scope       = 2,
+            clr         = Color( 255, 255, 0 ),
+            assoc = function( ... )
+                rcc.call:Orion( ... )
+            end,
+        },
+    }
+
+    base.calls.commands:Register( pkg_commands )
+end
+hook.Add( pid( 'cmd.register' ), pid( '__orion.cmd.register' ), register_commands )
+
+/*
 *   register package
 */
 
 local function register_pkg( )
     if not istable( _M ) then return end
-    base.pkgs:register( _M )
+    base.package:Register( _M )
 end
-hook.Add( pid( 'pkg.register' ), pid( '__rnet.pkg.register' ), register_pkg )
+hook.Add( pid( 'pkg.register' ), pid( '__orion.pkg.register' ), register_pkg )
+
+/*
+*   module info :: manifest
+*/
+
+function pkg:manifest( )
+    return self.__manifest
+end
 
 /*
 *   __tostring
@@ -191,14 +291,6 @@ function pkg:loader( class )
     class = class or { }
     self.__index = self
     return setmetatable( class, self )
-end
-
-/*
-*   module info :: manifest
-*/
-
-function pkg:manifest( )
-    return self.__manifest
 end
 
 /*

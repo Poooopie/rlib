@@ -1,11 +1,10 @@
 /*
-*   @package        rlib
-*   @author         Richard [http://steamcommunity.com/profiles/76561198135875727]
-*   @copyright      (C) 2018 - 2020
-*   @since          1.0.0
-*   @website        https://rlib.io
-*   @docs           https://docs.rlib.io
-*   @file           uclass.lua
+*   @package        : rlib
+*   @author         : Richard [http://steamcommunity.com/profiles/76561198135875727]
+*   @copyright      : (C) 2018 - 2020
+*   @since          : 1.0.0
+*   @website        : https://rlib.io
+*   @docs           : https://docs.rlib.io
 * 
 *   MIT License
 *
@@ -27,6 +26,12 @@ local prefix                = mf.prefix
 local cfg                   = base.settings
 
 /*
+*   simplifiy funcs
+*/
+
+local function log( ... ) base:log( ... ) end
+
+/*
 *   Localized rlib routes
 */
 
@@ -34,11 +39,7 @@ local helper                = base.h
 local design                = base.d
 local ui                    = base.i
 local mats                  = base.m
-local utils                 = base.u
-local access                = base.a
-local tools                 = base.t
-local konsole               = base.k
-local sys                   = base.sys
+local cvar                  = base.v
 
 /*
 *   Localized lua funcs
@@ -47,31 +48,21 @@ local sys                   = base.sys
 */
 
 local pairs                 = pairs
-local ipairs                = ipairs
-local SortedPairs           = SortedPairs
 local type                  = type
-local error                 = error
-local print                 = print
-local GetConVar             = GetConVar
-local tonumber              = tonumber
 local tostring              = tostring
 local IsValid               = IsValid
 local istable               = istable
 local isfunction            = isfunction
-local isentity              = isentity
 local isnumber              = isnumber
 local IsColor               = IsColor
 local Color                 = Color
-local Material              = Material
 local ScreenScale           = ScreenScale
 local gui                   = gui
 local vgui                  = vgui
 local table                 = table
-local player                = player
 local math                  = math
 local surface               = surface
 local draw                  = draw
-local render                = render
 local string                = string
 local sf                    = string.format
 
@@ -186,6 +177,7 @@ helper._vgui =
     [ 'scrollpnl' ]             = 'DScrollPanel',
     [ 'spanel' ]                = 'DScrollPanel',
     [ 'spnl' ]                  = 'DScrollPanel',
+    [ 'dsp' ]                   = 'DScrollPanel',
     [ 'sgrip' ]                 = 'DScrollBarGrip',
     [ 'grip' ]                  = 'DScrollBarGrip',
     [ 'autosize' ]              = 'DSizeToContents',
@@ -371,11 +363,11 @@ end
 
 function ui:cscale( bSimple, i800, i1024, i1280, i1366, i1600, i1920, i2xxx )
     if not isbool( bSimple ) then
-        base:log( 2, 'func [ %s ]: bSimple not bool', debug.getinfo( 1, 'n' ).name )
+        log( 2, 'func [ %s ]: bSimple not bool', debug.getinfo( 1, 'n' ).name )
     end
 
     if not i800 then
-        base:log( 2, 'func [ %s ]: no scale int specified', debug.getinfo( 1, 'n' ).name )
+        log( 2, 'func [ %s ]: no scale int specified', debug.getinfo( 1, 'n' ).name )
     end
 
     if not i1024 then i1024, i1280, i1366, i1600, i1920, i2xxx = i800, i800, i800, i800, i800, i800 end
@@ -431,11 +423,11 @@ end
 
 function ui:SmartScale_Strict( bSimple, i800, i1024, i1280, i1366, i1600, i1920, i2560 )
     if not isbool( bSimple ) then
-        base:log( 2, 'func [ %s ]: bSimple not bool', debug.getinfo( 1, 'n' ).name )
+        log( 2, 'func [ %s ]: bSimple not bool', debug.getinfo( 1, 'n' ).name )
     end
 
     if not i800 then
-        base:log( 2, 'func [ %s ]: no scale int specified', debug.getinfo( 1, 'n' ).name )
+        log( 2, 'func [ %s ]: no scale int specified', debug.getinfo( 1, 'n' ).name )
     end
 
     if not i1024 then i1024, i1280, i1366, i1600, i1920, i2560 = i800, i800, i800, i800, i800, i800 end
@@ -893,7 +885,7 @@ function ui:pos_anim( pnl, time, from )
     time = isnumber( time ) and time or 0.4
     from = isnumber( from ) and from or 4
 
-    if helper:cvar_bool( 'rlib_animations_enabled' ) then
+    if cvar:GetBool( 'rlib_animations_enabled' ) then
         self:pos_center( pnl, time, from )
     else
         self:pos_center( pnl )
@@ -936,7 +928,7 @@ end
 
 function ui:register( id, mod, panel, desc )
     if not helper.str:valid( id ) then
-        base:log( 2, lang( 'inf_reg_id_invalid' ) )
+        log( 2, lang( 'inf_reg_id_invalid' ) )
         return false
     end
 
@@ -952,7 +944,7 @@ function ui:register( id, mod, panel, desc )
             pnl     = panel,
             desc    = desc or lang( 'none' )
         }
-        base:log( 6, lang( 'inf_registered', id ) )
+        log( 6, lang( 'inf_registered', id ) )
     end
 end
 
@@ -972,14 +964,14 @@ end
 
 function ui:load( id, mod )
     if not helper.str:valid( id ) then
-        base:log( 2, lang( 'inf_load_id_invalid' ) )
+        log( 2, lang( 'inf_load_id_invalid' ) )
         return false
     end
 
     mod = ( isstring( mod ) and mod ) or ( istable( mod ) and mod.id ) or prefix
 
     if not istable( base.p ) then
-        base:log( 2, lang( 'inf_load_tbl_invalid' ) )
+        log( 2, lang( 'inf_load_tbl_invalid' ) )
         return false
     end
 
@@ -1005,14 +997,14 @@ end
 
 function ui:call( id, mod )
     if not helper.str:valid( id ) then
-        base:log( 2, lang( 'inf_load_id_invalid' ) )
+        log( 2, lang( 'inf_load_id_invalid' ) )
         return false
     end
 
     mod = ( isstring( mod ) and mod ) or ( istable( mod ) and mod.id ) or prefix
 
     if not istable( base.p ) then
-        base:log( 2, lang( 'inf_load_tbl_invalid' ) )
+        log( 2, lang( 'inf_load_tbl_invalid' ) )
         return false
     end
 
@@ -1033,14 +1025,14 @@ end
 
 function ui:unregister( id, mod )
     if not helper.str:valid( id ) then
-        base:log( 2, lang( 'inf_unreg_id_invalid' ) )
+        log( 2, lang( 'inf_unreg_id_invalid' ) )
         return false
     end
 
     mod = isstring( mod ) and mod or prefix
 
     if not istable( base.p ) then
-        base:log( 2, lang( 'inf_unreg_tbl_invalid' ) )
+        log( 2, lang( 'inf_unreg_tbl_invalid' ) )
         return false
     end
 
@@ -1048,7 +1040,7 @@ function ui:unregister( id, mod )
 
     if base.p[ mod ] and base.p[ mod ][ id ] then
         base.p[ mod ][ id ] = nil
-        base:log( 6, lang( 'inf_unregister', id ) )
+        log( 6, lang( 'inf_unregister', id ) )
     end
 end
 
@@ -1114,7 +1106,7 @@ end
 
 function ui:dispatch( id, mod )
     if not helper.str:valid( id ) then
-        base:log( 2, lang( 'inf_load_id_invalid' ) )
+        log( 2, lang( 'inf_load_id_invalid' ) )
         return
     end
 
@@ -1138,7 +1130,7 @@ end
 
 function ui:stage( id, mod )
     if not helper.str:valid( id ) then
-        base:log( 2, lang( 'inf_load_id_invalid' ) )
+        log( 2, lang( 'inf_load_id_invalid' ) )
         return
     end
 
@@ -1161,7 +1153,7 @@ end
 
 function ui:unstage( id, mod )
     if not helper.str:valid( id ) then
-        base:log( 2, lang( 'inf_load_id_invalid' ) )
+        log( 2, lang( 'inf_load_id_invalid' ) )
         return
     end
 
@@ -1183,7 +1175,7 @@ end
 
 function ui:fonts_register( suffix, font, scale )
     suffix  = isstring( suffix ) and suffix or prefix
-    font    = isstring( font ) and font or pid( 'sys.entry.default' )
+    font    = isstring( font ) and font or pid( 'sys_entry_default' )
     scale   = isnumber( scale ) and scale or self:scale( )
 
     local char_last = string.sub( suffix, -1 )
@@ -1432,12 +1424,12 @@ local uclass = { }
     /*
     *   ui :: class :: Panel :: SetConVar
     *
-    *   @param  : str cvar
+    *   @param  : str id
     */
 
-    function uclass.convar( pnl, cvar )
-        cvar = isstring( cvar ) and cvar or ''
-        pnl:SetConVar( cvar )
+    function uclass.convar( pnl, id )
+        id = isstring( id ) and id or ''
+        pnl:SetConVar( id )
     end
 
     /*
@@ -1584,7 +1576,7 @@ local uclass = { }
     /*
     *   ui :: class :: paint :: entry
     *
-    *   @alias  : paintentry, drawentry, pe
+    *   @alias  : paintentry, drawentry
     *
     *   @param  : clr clr_text
     *   @param  : clr clr_cur
@@ -1604,12 +1596,11 @@ local uclass = { }
         end
     end
     uclass.drawentry  = uclass.paintentry
-    uclass.pe         = uclass.paintentry
 
     /*
     *   ui :: class :: paint :: rounded box
     *
-    *   @alias  : paintrbox, drawrbox, rbox, prb
+    *   @alias  : paintrbox, drawrbox, rbox
     *
     *   @param  : clr clr
     *   @param  : int x
@@ -1637,7 +1628,6 @@ local uclass = { }
     end
     uclass.drawrbox   = uclass.paintrbox
     uclass.rbox       = uclass.paintrbox
-    uclass.prb        = uclass.paintrbox
 
     /*
     *   ui :: class :: debug :: where
@@ -1922,8 +1912,9 @@ local uclass = { }
             fn( s, ... )
         end
     end
-    uclass.ogfo       = uclass.ongetfocus
-    uclass.getfocus   = uclass.ongetfocus
+    uclass.ogfo         = uclass.ongetfocus
+    uclass.getfocus     = uclass.ongetfocus
+    uclass.ogfocus      = uclass.ongetfocus
 
     /*
     *   ui :: class :: DNum :: OnValueChanged
@@ -2666,7 +2657,7 @@ local uclass = { }
     */
 
     function uclass.setfont( pnl, str )
-        str = isstring( str ) and str or pid( 'sys.entry.default' )
+        str = isstring( str ) and str or pid( 'sys_entry_default' )
         pnl:SetFont( str )
     end
     uclass.font = uclass.setfont
@@ -3056,7 +3047,7 @@ local uclass = { }
     function uclass.txt( pnl, text, clr, font, bautosz, align )
         text    = isstring( text ) and text or ''
         clr     = IsColor( clr ) and clr or Color( 255, 255, 255, 255 )
-        font    = isstring( font ) and font or pid( 'sys.entry.default' )
+        font    = isstring( font ) and font or pid( 'sys_entry_default' )
 
         pnl:SetTextColor( clr )
         pnl:SetFont( font )
@@ -3095,7 +3086,7 @@ local uclass = { }
 
     function uclass.textadv( pnl, clr, font, text, bautosz )
         clr     = IsColor( clr ) and clr or Color( 255, 255, 255, 255 )
-        font    = isstring( font ) and font or pid( 'sys.entry.default' )
+        font    = isstring( font ) and font or pid( 'sys_entry_default' )
         text    = isstring( text ) and text or ''
 
         pnl:SetTextColor( clr )
@@ -3134,7 +3125,7 @@ local uclass = { }
     function uclass.label( pnl, text, clr, font, bautosz, align )
         text        = isstring( text ) and text or ''
         clr         = IsColor( clr ) and clr or Color( 255, 255, 255, 255 )
-        font        = isstring( font ) and font or pid( 'sys.entry.default' )
+        font        = isstring( font ) and font or pid( 'sys_entry_default' )
         bautosz     = bautosz or false
         align       = isnumber( align ) and align or 4
 
@@ -4293,7 +4284,7 @@ local uclass = { }
             *   set / get font text size
             */
 
-            surface.SetFont( pid( 'sys.tippy.text' ) )
+            surface.SetFont( pid( 'sys_tippy_text' ) )
             local sz_w, sz_h    = surface.GetTextSize( str )
             sz_w                = sz_w + 50
 
@@ -4338,7 +4329,7 @@ local uclass = { }
                                 :draw( function( s, w, h )
                                     design.rbox( 4, 0, 0, sz_w, 25, clr_out )
                                     design.rbox( 4, 1, 1, sz_w - 2, 25 - 2, clr_box )
-                                    draw.SimpleText( string.format( '%s %s' , helper.get:utf8char( cfg.tips.clrs.utf ), str ), pid( 'sys.tippy.text' ), 15, ( 25 / 2 ), clr_text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER )
+                                    draw.SimpleText( sf( '%s %s' , helper.get:utf8char( cfg.tips.clrs.utf ), str ), pid( 'sys_tippy_text' ), 15, ( 25 / 2 ), clr_text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER )
                                 end )
 
         end
@@ -4938,7 +4929,7 @@ end
 
 function ui.new( class, panel, name )
     if not class then
-        base:log( 2, lang( 'logs_inf_regclass_err' ) )
+        log( 2, lang( 'logs_inf_regclass_err' ) )
         return
     end
 
@@ -4970,7 +4961,7 @@ ui.gmod = ui.new
 
 function ui.rlib( mod, id, panel, name )
     if not id then
-        base:log( 2, lang( 'logs_inf_regclass_err' ) )
+        log( 2, lang( 'logs_inf_regclass_err' ) )
         return
     end
 
@@ -4995,7 +4986,7 @@ end
 
 function ui.add( class, parent )
     if not class then
-        base:log( 2, lang( 'logs_inf_regclass_err' ) )
+        log( 2, lang( 'logs_inf_regclass_err' ) )
         return
     end
 
