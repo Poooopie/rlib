@@ -16,7 +16,7 @@
   "autorun/rlib/packages/timex.lua": "b97ad0ce3033e22ea3d17a6354ece494370547f2",
   "autorun/rlib/packages/spew.lua": "094f02812d64ca16f55398a1e8e176ce47053bdc",
   "autorun/rlib/layout/rlib_lo_mviewer.lua": "7afa2f53ce46d7519d35bdd0cc180f96c4fe6682",
-  "autorun/rlib/packages/rnet.lua": "97ae275982037eb0f5771a944cd5ce19ae2cdd82",
+  "autorun/rlib/packages/rnet.lua": "80f17e75c3267c5e080437265634047a676ed0cf",
   "autorun/rlib/packages/rhook.lua": "ddad92ea313a432a636f80bc2ab27382e7cddfaf",
   "autorun/rlib/obj/obj_dlist.lua": "0aac4446774a2746b75675b7ccb549d29df9ebab",
   "autorun/rlib/get.lua": "0c294ac32cbd888893516ca7f4718a8c57343e33",

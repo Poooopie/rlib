@@ -513,6 +513,7 @@ function write( name, enum, bits )
         bits    = bits
     }
 end
+add = write
 
 /*
 *   rnet :: register
@@ -536,6 +537,7 @@ function register( )
         base:log( dcat, 'registered id [ %s ]', id )
     end
 end
+run = register
 
 /*
 *   rnet :: read
